@@ -68,6 +68,11 @@ func _ready():
 	# Always connect area_entered to hit enemies/fireballs
 	area_entered.connect(_on_area_entered_custom)
 
+	# Add random offset (±10 degrees) to direction and rotation
+	var offset = deg_to_rad(randf_range(-10.0, 10.0))
+	direction = direction.rotated(offset)
+	rotation += offset
+
 	_setup_visuals()
 
 func _setup_visuals():
