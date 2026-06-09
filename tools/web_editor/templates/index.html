@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprite 像素级编辑器</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sprite 像素级编辑器</h1>
+            <p>手动清除残留像素，保护画面主体</p>
+        </header>
+
+        <div class="toolbar">
+            <input type="file" id="fileInput" accept="image/*">
+            <div class="controls">
+                <label>容差: <input type="number" id="tolerance" value="20" min="0" max="255"></label>
+                <button id="autoCleanBtn" class="btn primary">自动去底</button>
+                <div class="divider"></div>
+                <button id="eraserBtn" class="btn tool">橡皮擦</button>
+                <label>大小: <input type="range" id="brushSize" min="1" max="50" value="10"></label>
+                <div class="divider"></div>
+                <button id="saveBtn" class="btn success">应用并保存</button>
+                <button id="downloadBtn" class="btn">导出 PNG</button>
+            </div>
+        </div>
+
+        <div class="editor-area">
+            <div class="canvas-container">
+                <canvas id="editorCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>

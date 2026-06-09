@@ -1,0 +1,100 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://scenes/World.tscn" id="2_world"]
+[ext_resource type="PackedScene" path="res://scenes/HUD.tscn" id="3_hud"]
+[ext_resource type="PackedScene" path="res://scenes/GameOver.tscn" id="4_gameover"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="MainLayout" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="BattleMargin" type="MarginContainer" parent="MainLayout"]
+layout_mode = 2
+size_flags_vertical = 3
+size_flags_stretch_ratio = 8.0
+theme_override_constants/margin_left = 100
+theme_override_constants/margin_right = 100
+
+[node name="BattleArea" type="HBoxContainer" parent="MainLayout/BattleMargin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 20
+
+[node name="ViewportContainer1" type="SubViewportContainer" parent="MainLayout/BattleMargin/BattleArea"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+stretch = true
+
+[node name="Viewport1" type="SubViewport" parent="MainLayout/BattleMargin/BattleArea/ViewportContainer1"]
+handle_input_locally = false
+size = Vector2i(798, 800)
+render_target_update_mode = 4
+
+[node name="World" parent="MainLayout/BattleMargin/BattleArea/ViewportContainer1/Viewport1" instance=ExtResource("2_world")]
+
+[node name="CameraP1" type="Camera2D" parent="MainLayout/BattleMargin/BattleArea/ViewportContainer1/Viewport1"]
+
+[node name="Divider" type="Control" parent="MainLayout/BattleMargin/BattleArea"]
+custom_minimum_size = Vector2(20, 0)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="ViewportContainer2" type="SubViewportContainer" parent="MainLayout/BattleMargin/BattleArea"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 2
+stretch = true
+
+[node name="Viewport2" type="SubViewport" parent="MainLayout/BattleMargin/BattleArea/ViewportContainer2"]
+handle_input_locally = false
+size = Vector2i(690, 800)
+render_target_update_mode = 4
+
+[node name="CameraP2" type="Camera2D" parent="MainLayout/BattleMargin/BattleArea/ViewportContainer2/Viewport2"]
+
+[node name="Dashboard" type="PanelContainer" parent="MainLayout"]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="InfoArea" type="HBoxContainer" parent="MainLayout/Dashboard"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="HUD1" parent="MainLayout/Dashboard/InfoArea" instance=ExtResource("3_hud")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HUD2" parent="MainLayout/Dashboard/InfoArea" instance=ExtResource("3_hud")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Borders" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="GameOver" parent="." instance=ExtResource("4_gameover")]
+visible = false
+layout_mode = 1
+

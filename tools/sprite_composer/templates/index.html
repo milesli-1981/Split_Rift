@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sprite Composer - 在线精灵编辑器</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="header-left">
+                <h1>Sprite Composer</h1>
+                <nav class="tabs">
+                    <button class="tab-btn active" data-tab="selection">1. 素材选择</button>
+                    <button class="tab-btn" data-tab="composition">2. 画布编辑</button>
+                </nav>
+            </div>
+            <div class="header-right">
+                <button id="downloadBtn" class="btn primary">下载结果 PNG</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- View 1: Selection -->
+            <div id="selectionView" class="tab-content active">
+                <div class="panel-full">
+                    <div class="panel-header">
+                        <h3>上传并框选素材</h3>
+                        <div class="panel-controls">
+                            <input type="file" id="uploadInput" accept="image/*">
+                            <div class="cleaner-controls">
+                                <label>去底容差: <input type="range" id="cleanerTolerance" min="0" max="150" value="30"> <span id="toleranceVal">30</span></label>
+                                <label><input type="checkbox" id="enableCleaner" checked> 开启自动去底</label>
+                            </div>
+                            <button id="clearCacheBtn" class="btn secondary">清空已选帧</button>
+                        </div>
+                    </div>
+                    <div class="source-container">
+                        <canvas id="sourceCanvas"></canvas>
+                    </div>
+                    <div class="source-footer">
+                        <p>操作说明：上传图片后，在图中拖拽鼠标框选区域。框选部分将自动加入帧列表。</p>
+                        <div class="mini-frame-list" id="miniFrameList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View 2: Composition -->
+            <div id="compositionView" class="tab-content">
+                <div class="panel-main">
+                    <div class="panel-header">
+                        <h3>排列与对齐</h3>
+                        <div class="panel-controls">
+                            <label class="grid-toggle">
+                                <input type="checkbox" id="gridToggle" checked> 显示网格
+                            </label>
+                            <div class="align-controls">
+                                <label>列数(N): 
+                                    <select id="gridColsSelect">
+                                        <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                                        <option value="4" selected>4</option><option value="5">5</option><option value="6">6</option>
+                                        <option value="8">8</option><option value="10">10</option>
+                                    </select>
+                                </label>
+                                <label>行数(M): 
+                                    <select id="gridRowsSelect">
+                                        <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                                        <option value="4" selected>4</option><option value="5">5</option><option value="6">6</option>
+                                        <option value="8">8</option><option value="10">10</option>
+                                    </select>
+                                </label>
+                                <button id="autoAlignBtn" class="btn primary">一键对齐</button>
+                            </div>
+                            <div id="frameControlPanel" style="display: none;">
+                                <label>缩放: <input type="range" id="frameScaleSlider" min="0.1" max="5.0" step="0.1" value="1.0"> <span id="frameScaleVal">1.0</span></label>
+                                <button id="deleteFrameBtn" class="btn danger">删除帧</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="canvas-container" id="mainCanvasContainer">
+                        <canvas id="mainCanvas" width="1024" height="1024"></canvas>
+                    </div>
+                </div>
+                
+                <div class="panel-side">
+                    <h3>预览与属性</h3>
+                    <div class="preview-container">
+                        <canvas id="previewCanvas" width="256" height="256"></canvas>
+                    </div>
+                    <div class="preview-controls">
+                        <label>速度: <input type="range" id="fpsSlider" min="1" max="60" value="10"> <span id="fpsVal">10</span> FPS</label>
+                    </div>
+                    <div class="anchor-info">
+                        <p>提示：点击画布中的帧可移动，拖拽右下角缩放，<strong>点击帧内部可设置锚点(红点)</strong>。</p>
+                    </div>
+                    <div class="frame-list-full">
+                        <h3>帧列表</h3>
+                        <ul id="framesUl"></ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

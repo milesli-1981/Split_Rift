@@ -1,0 +1,94 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://scripts/fireball.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://素材/effects/fireball.png" id="2_6se3a"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_fireball"]
+radius = 34.234486
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6se3a"]
+atlas = ExtResource("2_6se3a")
+region = Rect2(0, 0, 192, 240)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2map7"]
+atlas = ExtResource("2_6se3a")
+region = Rect2(192, 0, 192, 240)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_arubn"]
+atlas = ExtResource("2_6se3a")
+region = Rect2(384, 0, 192, 240)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_v6c2k"]
+atlas = ExtResource("2_6se3a")
+region = Rect2(576, 0, 192, 240)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rfmch"]
+atlas = ExtResource("2_6se3a")
+region = Rect2(768, 0, 192, 240)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bl534"]
+atlas = ExtResource("2_6se3a")
+region = Rect2(960, 0, 192, 240)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j1r2c"]
+atlas = ExtResource("2_6se3a")
+region = Rect2(1152, 0, 192, 240)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4ws6w"]
+atlas = ExtResource("2_6se3a")
+region = Rect2(1344, 0, 192, 240)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_bl534"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6se3a")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2map7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_arubn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_v6c2k")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rfmch")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bl534")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j1r2c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4ws6w")
+}],
+"loop": true,
+"name": &"default",
+"speed": 10.0
+}]
+
+[node name="Fireball" type="Area2D"]
+script = ExtResource("1_script")
+
+[node name="Shadow" type="Polygon2D" parent="."]
+modulate = Color(0, 0, 0, 0.235294)
+z_index = -1
+position = Vector2(11.929999, -25)
+scale = Vector2(0.6, 0.5)
+antialiased = true
+polygon = PackedVector2Array(-30, -15, -21.21, -21.21, 0, -30, 21.21, -21.21, 30, -15, 36.21, 0, 30, 15, 21.21, 21.21, 0, 30, -21.21, 21.21, -30, 15, -36.21, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_fireball")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(-11, -1)
+scale = Vector2(0.55711067, 0.512031)
+sprite_frames = SubResource("SpriteFrames_bl534")
+frame_progress = 0.6064685
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+

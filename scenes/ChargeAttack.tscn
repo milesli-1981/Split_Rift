@@ -1,0 +1,63 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://scripts/charge_attack.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://素材/effects/charge_attack.png" id="2_07jra"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_charge"]
+size = Vector2(83.25, 182.75)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dvbq5"]
+atlas = ExtResource("2_07jra")
+region = Rect2(0, 0, 160, 512)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rjmer"]
+atlas = ExtResource("2_07jra")
+region = Rect2(160, 0, 160, 512)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_515ap"]
+atlas = ExtResource("2_07jra")
+region = Rect2(320, 0, 160, 512)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qc1dq"]
+atlas = ExtResource("2_07jra")
+region = Rect2(480, 0, 160, 512)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i0uok"]
+atlas = ExtResource("2_07jra")
+region = Rect2(0, 512, 160, 512)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_u4a8y"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dvbq5")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rjmer")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_515ap")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qc1dq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i0uok")
+}],
+"loop": true,
+"name": &"default",
+"speed": 8.0
+}]
+
+[node name="ChargeAttack" type="Area2D" groups=["charge_attacks"]]
+script = ExtResource("1_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-0.625, 0.375)
+shape = SubResource("RectangleShape2D_charge")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(-0.37499738, -0.6249884)
+scale = Vector2(0.47968757, 0.41943362)
+sprite_frames = SubResource("SpriteFrames_u4a8y")
+frame = 4

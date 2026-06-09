@@ -1,0 +1,105 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/hud.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://素材/ui/info_panel_review.png" id="2_bg"]
+
+[node name="HUD" type="Control"]
+custom_minimum_size = Vector2(400, 120)
+layout_mode = 3
+anchors_preset = 0
+offset_right = 400.0
+offset_bottom = 120.0
+size_flags_horizontal = 3
+mouse_filter = 2
+script = ExtResource("1_script")
+
+[node name="InfoPanel" type="NinePatchRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_bg")
+patch_margin_left = 20
+patch_margin_top = 20
+patch_margin_right = 20
+patch_margin_bottom = 20
+
+[node name="Margin" type="MarginContainer" parent="InfoPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 10
+
+[node name="MainHBox" type="HBoxContainer" parent="InfoPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 15
+alignment = 1
+
+[node name="PortraitContainer" type="CenterContainer" parent="InfoPanel/Margin/MainHBox"]
+layout_mode = 2
+size_flags_vertical = 8
+
+[node name="PortraitBG" type="Control" parent="InfoPanel/Margin/MainHBox/PortraitContainer"]
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="PortraitRect" type="TextureRect" parent="InfoPanel/Margin/MainHBox/PortraitContainer/PortraitBG"]
+custom_minimum_size = Vector2(160, 160)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -80.0
+offset_top = -80.0
+offset_right = 80.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="StatsVBox" type="VBoxContainer" parent="InfoPanel/Margin/MainHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="HeartsContainer" type="HBoxContainer" parent="InfoPanel/Margin/MainHBox/StatsVBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="ChargeSegments" type="HBoxContainer" parent="InfoPanel/Margin/MainHBox/StatsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="Bar1" type="ProgressBar" parent="InfoPanel/Margin/MainHBox/StatsVBox/ChargeSegments"]
+custom_minimum_size = Vector2(40, 8)
+layout_mode = 2
+max_value = 1.0
+show_percentage = false
+
+[node name="Bar2" type="ProgressBar" parent="InfoPanel/Margin/MainHBox/StatsVBox/ChargeSegments"]
+custom_minimum_size = Vector2(40, 8)
+layout_mode = 2
+max_value = 1.0
+show_percentage = false
+
+[node name="Bar3" type="ProgressBar" parent="InfoPanel/Margin/MainHBox/StatsVBox/ChargeSegments"]
+custom_minimum_size = Vector2(40, 8)
+layout_mode = 2
+max_value = 1.0
+show_percentage = false
+

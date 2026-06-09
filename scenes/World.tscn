@@ -1,0 +1,39 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/game_world.gd" id="1_script"]
+[ext_resource type="Texture2D" path="res://素材/backgrounds/forest_bg.png" id="2_bg_tex"]
+[ext_resource type="PackedScene" path="res://scenes/Player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://scenes/Enemy.tscn" id="4_enemy"]
+
+[node name="World" type="Node2D"]
+script = ExtResource("1_script")
+enemy_scene = ExtResource("4_enemy")
+
+[node name="Background" type="Node2D" parent="."]
+z_index = -10
+
+[node name="BG_Texture" type="Sprite2D" parent="Background"]
+texture_repeat = 2
+position = Vector2(800, 0)
+texture = ExtResource("2_bg_tex")
+region_enabled = true
+region_rect = Rect2(0, 0, 1600, 2048)
+
+[node name="Clouds" type="Node2D" parent="Background"]
+
+[node name="Stars" type="Node2D" parent="Background"]
+visible = false
+
+[node name="Player1" parent="." instance=ExtResource("3_player")]
+position = Vector2(180, 1000)
+
+[node name="Player2" parent="." instance=ExtResource("3_player")]
+position = Vector2(540, 1000)
+player_id = 2
+
+[node name="SpawnTimer" type="Timer" parent="."]
+wait_time = 4.0
+autostart = true
+
+[connection signal="timeout" from="SpawnTimer" to="." method="_on_spawn_timer_timeout"]
+
