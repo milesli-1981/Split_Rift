@@ -37,23 +37,34 @@ func _ready():
 	var p2 = world.get_node_or_null("Player2")
 
 	if p1:
-		# Calculate viewport width based on actual size
+		# Calculate viewport size based on actual container size
 		# Force a slight delay to ensure UI layout is calculated
 		await get_tree().process_frame
 		
-		var single_width = 600.0 # Target narrower width
-		if battle_area and battle_area.size.x > 100:
-			single_width = (battle_area.size.x - 20.0) / 2.0
+		var v_height = viewport1.size.y
+		var v_width = viewport1.size.x
+		
+		# Update world's camera_y and player bounds based on actual viewport height
+		world.camera_y = v_height / 2.0
 		
 		p1.min_x = 0.0
-		p1.max_x = single_width
-		p1.camera_y = 400.0
-		p1.position = Vector2(single_width / 2.0, 650.0)
+		p1.max_x = v_width
+		p1.camera_y = world.camera_y
+		p1.position = Vector2(v_width / 2.0, v_height - 150.0)
 		
-		p2.min_x = 800.0 # P2 viewport is offset in World space
-		p2.max_x = 800.0 + single_width
-		p2.camera_y = 400.0
-		p2.position = Vector2(800.0 + single_width / 2.0, 650.0)
+		# P2 lane starts at 800 in the World coordinate system
+		p2.min_x = 800.0 
+		p2.max_x = 800.0 + v_width
+		p2.camera_y = world.camera_y
+		p2.position = Vector2(800.0 + v_width / 2.0, v_height - 150.0)
+
+		# Initial camera positions (Perfectly centered on the lanes)
+		camera1.global_position = Vector2(v_width / 2.0, world.camera_y)
+		camera2.global_position = Vector2(800.0 + v_width / 2.0, world.camera_y)
+		
+		# Update World's lane information if it has those properties
+		if world.has_method("update_lane_info"):
+			world.update_lane_info(v_width)
 
 	p1.scroll_speed = scroll_speed
 	p1.health_changed.connect(func(h): _on_player_health_changed(1, h))
@@ -78,10 +89,6 @@ func _ready():
 		hud2.update_energy(0, 0.0)
 		hud2.set_portrait(p2.character_data.get("portrait_path", ""))
 		hud2.set_layout_mirrored(true) # P2 portrait on right
-
-	# Initial camera positions (Center of 800 height is 400)
-	camera1.global_position = Vector2(400, 400)
-	camera2.global_position = Vector2(1200, 400)
 
 func _process(delta):
 	# Update combos
@@ -142,6 +149,7 @@ func _show_floating_combo(count: int, pos: Vector2):
 	tween.tween_callback(label.queue_free)
 
 func _handle_combo_fireball(target_id: int, current_combo: int, pos: Vector2):
+	# Increased threshold from 2 back to 4 to reduce fireball spam
 	if current_combo >= 4 and (current_combo - 4) % 2 == 0:
 		send_fireball(target_id, current_combo, -1, pos)
 
@@ -167,12 +175,6 @@ func send_fireball(target_id: int, combo: int, force_type: int = -1, source_pos:
 		fireball.sender_player_id = 1 if target_id == 2 else 2
 		fireball.z_index = 10
 
-		if source_pos != Vector2.ZERO:
-			fireball.global_position = source_pos
-		else:
-			var target_x_center = 400.0 if target_id == 1 else 1200.0
-			fireball.global_position = Vector2(target_x_center, world.camera_y - 450)
-
 		if force_type != -1:
 			fireball.fireball_type = force_type
 		else:
@@ -181,8 +183,16 @@ func send_fireball(target_id: int, combo: int, force_type: int = -1, source_pos:
 		fireball.update_visuals()
 		world.add_child(fireball)
 
+		if source_pos != Vector2.ZERO:
+			fireball.global_position = source_pos
+		else:
+			var v_width = viewport1.size.x
+			var target_x_center = (v_width / 2.0) if target_id == 1 else (800.0 + v_width / 2.0)
+			fireball.global_position = Vector2(target_x_center, world.camera_y - 450)
+
 		if fireball.has_method("launch_parabolic") and fireball.fireball_type != 2:
-			var target_x_center = 400.0 if target_id == 1 else 1200.0
+			var v_width = viewport1.size.x
+			var target_x_center = (v_width / 2.0) if target_id == 1 else (800.0 + v_width / 2.0)
 			var target_pos = Vector2(target_x_center + randf_range(-200, 200), world.camera_y - 300)
 			var height = randf_range(300, 600)
 			var duration = randf_range(1.0, 1.5)
@@ -201,11 +211,23 @@ func send_opponent_attack(target_id: int, type_str: String, source_pos: Vector2,
 		rift.extra_type = type_str
 		rift.sender_player = sender_player
 		
-		var target_x_center = 400.0 if target_id == 1 else 1200.0
-		var spawn_x = target_x_center + randf_range(-300, 300)
-		var spawn_y = world.camera_y + randf_range(150, 450)
+		var v_width = viewport1.size.x
+		var target_x_center = (v_width / 2.0) if target_id == 1 else (800.0 + v_width / 2.0)
 		
-		rift.global_position = Vector2(spawn_x, spawn_y)
+		# Ensure spawn position is away from the player
+		var spawn_pos = Vector2.ZERO
+		var target_player = get_player(target_id)
+		var min_dist = 220.0 # Minimum distance from player
+		
+		for attempt in range(10): # Try a few times to find a good spot
+			var sx = target_x_center + randf_range(-v_width * 0.45, v_width * 0.45)
+			var sy = world.camera_y + randf_range(100, 450)
+			spawn_pos = Vector2(sx, sy)
+			if target_player and is_instance_valid(target_player):
+				if spawn_pos.distance_to(target_player.global_position) > min_dist:
+					break
+		
+		rift.global_position = spawn_pos
 		world.add_child(rift)
 	elif extra_attack_scene:
 		var ex = extra_attack_scene.instantiate()
@@ -213,11 +235,23 @@ func send_opponent_attack(target_id: int, type_str: String, source_pos: Vector2,
 		ex.sender_player_id = 1 if target_id == 2 else 2
 		ex.source_player = sender_player
 		
-		var target_x_center = 400.0 if target_id == 1 else 1200.0
-		var spawn_x = target_x_center + randf_range(-300, 300)
-		var spawn_y = world.camera_y + randf_range(150, 450)
+		var v_width = viewport1.size.x
+		var target_x_center = (v_width / 2.0) if target_id == 1 else (800.0 + v_width / 2.0)
 		
-		ex.global_position = Vector2(spawn_x, spawn_y)
+		# Ensure spawn position is away from the player
+		var spawn_pos = Vector2.ZERO
+		var target_player = get_player(target_id)
+		var min_dist = 220.0
+		
+		for attempt in range(10):
+			var sx = target_x_center + randf_range(-v_width * 0.45, v_width * 0.45)
+			var sy = world.camera_y + randf_range(100, 450)
+			spawn_pos = Vector2(sx, sy)
+			if target_player and is_instance_valid(target_player):
+				if spawn_pos.distance_to(target_player.global_position) > min_dist:
+					break
+					
+		ex.global_position = spawn_pos
 		world.add_child(ex)
 
 func spawn_charge_attack(player_id: int, type_str: String, pos: Vector2, sender_player: Node2D):
@@ -257,7 +291,21 @@ func send_opponent_attack_direct(target_id: int, type_str: String, source_pos: V
 		if use_exact_pos:
 			ex.global_position = source_pos
 		else:
-			var target_x_center = 400.0 if target_id == 1 else 1200.0
-			ex.global_position = Vector2(target_x_center + randf_range(-300, 300), world.camera_y + 400)
+			var v_width = viewport1.size.x
+			var target_x_center = (v_width / 2.0) if target_id == 1 else (800.0 + v_width / 2.0)
+			
+			# Ensure spawn position is away from the player
+			var spawn_pos = Vector2.ZERO
+			var target_player = get_player(target_id)
+			var min_dist = 220.0
+			
+			for attempt in range(10):
+				var sx = target_x_center + randf_range(-v_width * 0.45, v_width * 0.45)
+				var sy = world.camera_y + 400
+				spawn_pos = Vector2(sx, sy)
+				if target_player and is_instance_valid(target_player):
+					if spawn_pos.distance_to(target_player.global_position) > min_dist:
+						break
+			ex.global_position = spawn_pos
 		
 		world.add_child(ex)

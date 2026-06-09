@@ -13,6 +13,10 @@ var cloud_texture: Texture2D = preload("res://素材/backgrounds/cloud_clean.png
 
 var fever_spawned: bool = false
 var death_spawned: bool = false
+var lane_width: float = 800.0 # Default fallback
+
+func update_lane_info(width: float):
+	lane_width = width
 
 func _ready():
 	# Create some stars for scrolling effect
@@ -108,7 +112,8 @@ func _check_special_spawns():
 
 func _spawn_special_enemy(is_fever: bool, is_death: bool):
 	# Spawn for both lanes
-	for x_center in [400, 1200]:
+	var centers = [lane_width / 2.0, 800.0 + lane_width / 2.0]
+	for x_center in centers:
 		var enemy = enemy_scene.instantiate()
 		enemy.position = Vector2(x_center, camera_y - 500)
 		if is_fever:
@@ -125,13 +130,13 @@ func _on_spawn_timer_timeout():
 	# Randomly pick a formation type
 	var formation_type = randi() % 4
 
-	# Spawn for Lane 1 (0 - 800)
-	spawn_formation(formation_type, randf_range(150, 650))
-	# Spawn for Lane 2 (800 - 1600)
-	spawn_formation(formation_type, randf_range(950, 1450))
+	# Spawn for Lane 1 (centered on Lane 1)
+	spawn_formation(formation_type, randf_range(lane_width * 0.2, lane_width * 0.8))
+	# Spawn for Lane 2 (centered on Lane 2, which starts at 800)
+	spawn_formation(formation_type, 800.0 + randf_range(lane_width * 0.2, lane_width * 0.8))
 
-	# Randomize next spawn time between 3.5 and 6 seconds to give more time
-	$SpawnTimer.wait_time = randf_range(3.5, 6.0)
+	# Randomize next spawn time between 1.5 and 3.0 seconds to keep intensity
+	$SpawnTimer.wait_time = randf_range(1.5, 3.0)
 
 func spawn_formation(type, x_pos):
 	var group_size = 8

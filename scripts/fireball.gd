@@ -90,14 +90,19 @@ func _process(delta):
 	_check_boundaries()
 
 func _check_boundaries():
+	# During parabolic launch, don't check horizontal boundaries as it's crossing between lanes
+	if is_parabolic:
+		return
+
 	var divider_x = 800.0
 	# 如果是发给 P1 (左屏)
 	if target_player_id == 1:
-		if global_position.x > divider_x - 10 or global_position.x < -100:
+		# 允许一点缓冲，防止刚进入边界就被删除
+		if global_position.x > divider_x + 50 or global_position.x < -200:
 			queue_free()
 	# 如果是发给 P2 (右屏)
 	else:
-		if global_position.x < divider_x + 10 or global_position.x > 1700:
+		if global_position.x < divider_x - 50 or global_position.x > 1800:
 			queue_free()
 
 	var world = get_tree().root.find_child("World", true, false)

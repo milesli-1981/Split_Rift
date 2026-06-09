@@ -128,8 +128,8 @@ func _setup_visuals():
 				if not sprite.texture:
 					sprite.texture = load("res://素材/effects/extra_attack.png")
 				
-				# 比例缩小
-				sprite.scale = Vector2(0.18, 0.18) 
+				# 比例进一步缩小 (从 0.18 缩小到 0.12)
+				sprite.scale = Vector2(0.12, 0.12) 
 				
 				if collision and collision.shape is RectangleShape2D:
 					var tex_size = sprite.texture.get_size()

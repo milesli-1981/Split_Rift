@@ -131,10 +131,10 @@ func _handle_movement(delta):
 	velocity = direction * speed
 	move_and_slide()
 	
-	position.x = clamp(position.x, min_x + 80, max_x - 80)
+	position.x = clamp(position.x, min_x + 40, max_x - 40)
 	# 限制 Y 轴移动，防止进入底部 Info Panel (Dashboard) 区域
-	# 假设战斗区域高度为 720 (900 - 180)，相机中心在 400，则底部边缘在 760 左右
-	position.y = clamp(position.y, camera_y - 340, camera_y + 300)
+	# 现在的战斗区域高度是动态计算的，camera_y 在中心
+	position.y = clamp(position.y, camera_y - (camera_y * 0.8), camera_y + (camera_y * 0.8))
 
 func _init_visual_nodes():
 	if not character_data.has("sprite_frames_path"):
@@ -462,8 +462,8 @@ func _send_charge_fireballs():
 	var main = get_tree().root.find_child("Main", true, false)
 	if main:
 		var target_id = 2 if player_id == 1 else 1
-		# Send a few fireballs to the opponent
-		for i in range(3):
+		# Send fewer fireballs to the opponent
+		for i in range(2):
 			var spawn_pos = global_position + Vector2(randf_range(-200, 200), -400) # Spawn from top area of target
 			main.send_fireball(target_id, 0, 0, spawn_pos) # Send normal fireballs for now, or 2 for EXTRA type
 
@@ -476,11 +476,11 @@ func notify_reflection(type: int):
 		reflected_counter_fireballs += 1
 		reflection_timer = 1.0 # 1 second window to chain reflections
 		
-		if reflected_counter_fireballs == 2:
-			# 2nd cumulative counter sends an Extra Attack
+		if reflected_counter_fireballs == 3:
+			# 3rd cumulative counter sends an Extra Attack
 			_send_opponent_attacks()
-		elif reflected_counter_fireballs >= 3:
-			# 3rd cumulative counter sends a Boss
+		elif reflected_counter_fireballs >= 5:
+			# 5th cumulative counter sends a Boss
 			_summon_boss()
 			reflected_counter_fireballs = 0
 			reflection_timer = 0.0
@@ -512,8 +512,8 @@ func _send_opponent_attacks():
 		# Use EXTRA_TYPE for opponent hazards
 		var extra_type = character_data.get("extra_type", "WAVE")
 		
-		# Send to opponent's lane
-		var count = 3 if extra_type != "SWARM" else 8
+		# Send to opponent's lane - reduced count to avoid spam
+		var count = 2 if extra_type != "SWARM" else 5
 		for i in range(count):
 			var spawn_pos = global_position + Vector2(randf_range(-100, 100), -20)
 			main.send_opponent_attack(target_id, extra_type, spawn_pos, self)

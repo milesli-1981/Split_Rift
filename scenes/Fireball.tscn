@@ -1,7 +1,7 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=13 format=3 uid="uid://wfuha7dvtdbg"]
 
-[ext_resource type="Script" path="res://scripts/fireball.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://素材/effects/fireball.png" id="2_6se3a"]
+[ext_resource type="Script" uid="uid://b6ro8uds4ijye" path="res://scripts/fireball.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://bpj8sie7daj3m" path="res://素材/effects/fireball.png" id="2_6se3a"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fireball"]
 radius = 34.234486
@@ -67,7 +67,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"default",
-"speed": 10.0
+"speed": 14.0
 }]
 
 [node name="Fireball" type="Area2D"]
@@ -88,7 +88,6 @@ shape = SubResource("CircleShape2D_fireball")
 position = Vector2(-11, -1)
 scale = Vector2(0.55711067, 0.512031)
 sprite_frames = SubResource("SpriteFrames_bl534")
-frame_progress = 0.6064685
+frame_progress = 0.87365746
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
-
