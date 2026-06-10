@@ -18,6 +18,7 @@ var initial_camera_y: float = 0.0
 # Raven specific
 var raven_state: int = 0 # 0: Dive, 1: Side-step, 2: Second Charge
 var raven_target_pos: Vector2 = Vector2.ZERO
+var raven_direction: Vector2 = Vector2.ZERO # Added for directional movement
 var raven_sidestep_dir: float = 1.0
 var raven_timer: float = 0.0
 var raven_texture: Texture2D = preload("res://素材/monster/raven.png")
@@ -51,8 +52,10 @@ func _ready():
 		# if $AnimatedSprite2D.sprite_frames.has_animation("raven"):
 		#     $AnimatedSprite2D.play("raven")
 		
-		# Set initial target
+		# Set initial target and direction
 		_update_raven_target()
+		raven_direction = (raven_target_pos - position).normalized()
+		
 		# Determine sidestep direction (move towards center of lane)
 		var lane_center = 400.0 if position.x < 800 else 1200.0
 		raven_sidestep_dir = 1.0 if position.x < lane_center else -1.0
@@ -134,7 +137,7 @@ func _enforce_boundaries():
 	var max_x = 800.0 if player_lane == 1 else 1600.0
 	
 	# Special handling for Raven: allow it to fly out of outer boundaries in State 2
-	if movement_type == MovementType.RAVEN and raven_state == 2:
+	if movement_type == MovementType.RAVEN and raven_state >= 1:
 		# Still prevent crossing the middle divider (800)
 		if player_lane == 1:
 			position.x = min(position.x, 800.0 - 20)
@@ -152,8 +155,8 @@ func _enforce_boundaries():
 			queue_free()
 		
 		# Extra cleanup for Raven flying off sides
-		if movement_type == MovementType.RAVEN and raven_state == 2:
-			if position.x < -200 or position.x > 1800:
+		if movement_type == MovementType.RAVEN:
+			if position.x < -400 or position.x > 2000:
 				queue_free()
 
 func _process_raven_movement(delta):
@@ -164,9 +167,8 @@ func _process_raven_movement(delta):
 
 	match raven_state:
 		0: # Dive
-			var dir = (raven_target_pos - position).normalized()
-			position += dir * speed * 2.0 * delta
-			# Removed rotation logic as requested
+			# Use constant direction to fly through the target point
+			position += raven_direction * speed * 2.0 * delta
 			
 			# Check if reached lower half
 			if position.y > cam_y + 100:
@@ -176,18 +178,17 @@ func _process_raven_movement(delta):
 			raven_timer -= delta
 			position.x += raven_sidestep_dir * speed * delta
 			position.y += speed * 0.5 * delta # Slight downward drift
-			# Removed rotation logic
 			
 			if raven_timer <= 0:
 				raven_state = 2
 				_update_raven_target() # Update target for second charge
+				raven_direction = (raven_target_pos - position).normalized()
 		2: # Second Charge
-			var dir = (raven_target_pos - position).normalized()
-			position += dir * speed * 2.5 * delta # Faster second charge
-			# Removed rotation logic
+			# Use constant direction to fly through the second target
+			position += raven_direction * speed * 2.5 * delta
 			
 			# Cleanup if flies off bottom or sides after second charge
-			if position.y > cam_y + 600 or position.x < -100 or position.x > 1700:
+			if position.y > cam_y + 600 or position.x < -300 or position.x > 1900:
 				queue_free()
 
 func update_visuals():

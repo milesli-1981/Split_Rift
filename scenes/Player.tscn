@@ -213,7 +213,7 @@ animation = &"idle"
 autoplay = "idle"
 frame = 2
 frame_progress = 0.8152063
-speed_scale = 0.8
+speed_scale = 0.685
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." groups=["players"]]
 position = Vector2(-0.125, -24.5)
@@ -225,5 +225,5 @@ z_index = -2
 position = Vector2(4.5000033, 23)
 scale = Vector2(0.6, 0.6)
 sprite_frames = SubResource("SpriteFrames_fgkxt")
-frame_progress = 0.9087079
-speed_scale = 1.13
+frame_progress = 0.7955519
+speed_scale = 0.865

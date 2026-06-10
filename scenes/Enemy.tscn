@@ -140,7 +140,7 @@ visible = false
 position = Vector2(4.7683716e-07, -16)
 scale = Vector2(0.45703122, 0.5625)
 sprite_frames = SubResource("SpriteFrames_isvm2")
-frame_progress = 0.995386
+frame_progress = 0.9691691
 speed_scale = 1.125
 
 [node name="Shadow" type="Polygon2D" parent="."]
@@ -157,6 +157,7 @@ position = Vector2(-12.769765, -9.855281)
 rotation = -0.08552113
 scale = Vector2(0.5687704, 0.5597023)
 sprite_frames = SubResource("SpriteFrames_oq86d")
-frame_progress = 0.91661274
+frame_progress = 0.003698279
+speed_scale = 1.15
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
