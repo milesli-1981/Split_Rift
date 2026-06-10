@@ -1,7 +1,8 @@
-[gd_scene load_steps=18 format=3 uid="uid://cdhtowufwsapu"]
+[gd_scene load_steps=29 format=3 uid="uid://cdhtowufwsapu"]
 
 [ext_resource type="Script" uid="uid://cg746afresadj" path="res://scripts/enemy.gd" id="1_script"]
 [ext_resource type="Texture2D" uid="uid://c66h6pwho8ux4" path="res://素材/monster/5.png" id="3_mpr68"]
+[ext_resource type="Texture2D" uid="uid://c6eahexktn0fv" path="res://素材/monster/yuren.png" id="4_5wwv6"]
 [ext_resource type="Texture2D" uid="uid://cgnt4ds7o13uf" path="res://素材/monster/6.png" id="4_ft8do"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_enemy"]
@@ -104,6 +105,77 @@ animations = [{
 "speed": 7.0
 }]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_ly5gv"]
+atlas = ExtResource("4_5wwv6")
+region = Rect2(0, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_82o86"]
+atlas = ExtResource("4_5wwv6")
+region = Rect2(256, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1gqeq"]
+atlas = ExtResource("4_5wwv6")
+region = Rect2(512, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oq86d"]
+atlas = ExtResource("4_5wwv6")
+region = Rect2(768, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_joqoj"]
+atlas = ExtResource("4_5wwv6")
+region = Rect2(0, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_govun"]
+atlas = ExtResource("4_5wwv6")
+region = Rect2(256, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hwoi6"]
+atlas = ExtResource("4_5wwv6")
+region = Rect2(512, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_g512e"]
+atlas = ExtResource("4_5wwv6")
+region = Rect2(768, 256, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pl6g4"]
+atlas = ExtResource("4_5wwv6")
+region = Rect2(0, 512, 256, 256)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_u1yns"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ly5gv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_82o86")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1gqeq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oq86d")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_joqoj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_govun")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hwoi6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_g512e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pl6g4")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
 [node name="Enemy" type="Area2D" groups=["enemies"]]
 script = ExtResource("1_script")
 
@@ -120,13 +192,20 @@ color = Color(0.13682577, 0.13682574, 0.13682571, 1)
 antialiased = true
 polygon = PackedVector2Array(-30, -15, -21.21, -21.21, 0, -30, 21.21, -21.21, 30, -15, 36.21, 0, 30, 15, 21.21, 21.21, 0, 30, -21.21, 21.21, -30, 15, -36.21, 0)
 
-[node name="body" type="AnimatedSprite2D" parent="."]
+[node name="niaoren" type="AnimatedSprite2D" parent="."]
+visible = false
 position = Vector2(-1.7697645, -4.855278)
 rotation = -0.08552113
 scale = Vector2(0.5687704, 0.5597023)
 sprite_frames = SubResource("SpriteFrames_oq86d")
 animation = &"destroy"
-frame_progress = 0.09789638
+frame_progress = 0.3094514
 speed_scale = 1.15
+
+[node name="yuren" type="AnimatedSprite2D" parent="."]
+position = Vector2(-0.7416085, -1.7899656)
+scale = Vector2(0.53704387, 0.5328909)
+sprite_frames = SubResource("SpriteFrames_u1yns")
+frame_progress = 0.14883897
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

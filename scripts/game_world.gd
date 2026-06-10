@@ -172,46 +172,52 @@ func spawn_raven_formation(x_offset):
 		add_child(enemy)
 
 func spawn_formation(type, x_pos):
-	var group_size = 5 # Reduced from 8
-	var delay_between = 0.4 # Slightly increased delay
+	var base_group_size = 5
+	var delay_between = 0.5
 
-	for i in range(group_size):
+	# Specialized parameters for STRAIGHT
+	if type == 0:
+		base_group_size = 8 # More enemies
+		delay_between = 0.3 # Tighter packing
+	
+	for i in range(base_group_size):
 		var enemy = enemy_scene.instantiate()
-		# Vary health: The first one is always the "fuse" (1 HP) to trigger chains
+		# Vary health
 		if i == 0:
 			enemy.health = 1
-		elif i < 3:
-			enemy.health = randi_range(2, 3)
 		else:
-			enemy.health = randi_range(3, 5)
+			enemy.health = randi_range(2, 4)
 
-		# Chance to be in a bubble
-		if randf() < 0.2: # 20% chance
+		# Chance to be in a bubble (reduced for STRAIGHT to keep it clean)
+		var bubble_chance = 0.1 if type == 0 else 0.2
+		if randf() < bubble_chance:
 			enemy.is_bubble = true
 
-		# Spawn 500 pixels above camera center (just off top of 800 height screen)
 		enemy.position = Vector2(x_pos, camera_y - 500)
-		enemy.spawn_offset = i * delay_between
-
+		
 		match type:
 			0: # STRAIGHT
 				enemy.movement_type = 0
-				enemy.speed = 140.0
+				enemy.speed = 280.0 # Much faster
+				enemy.spawn_offset = i * delay_between
 			1: # SINE
 				enemy.movement_type = 1
 				enemy.amplitude = 150.0
 				enemy.frequency = 3.0
-				enemy.speed = 110.0
+				enemy.speed = 120.0
+				enemy.spawn_offset = i * delay_between
 			2: # ZIGZAG
 				enemy.movement_type = 2
 				enemy.amplitude = 180.0
 				enemy.frequency = 2.0
-				enemy.speed = 90.0
+				enemy.speed = 100.0
+				enemy.spawn_offset = i * delay_between
 			3: # CIRCLE
 				enemy.movement_type = 3
 				enemy.amplitude = 100.0
 				enemy.frequency = 4.0
-				enemy.speed = 80.0
+				enemy.speed = 90.0
+				enemy.spawn_offset = i * delay_between
 
 		add_child(enemy)
 

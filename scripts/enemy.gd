@@ -40,37 +40,25 @@ func _ready():
 	if has_node("ColorRect"):
 		$ColorRect.visible = false
 	
-	# Start animation on 'body' node
-	if has_node("body"):
-		$body.play("default")
-		if not $body.animation_finished.is_connected(_on_animation_finished):
-			$body.animation_finished.connect(_on_animation_finished)
-	# Backward compatibility for old AnimatedSprite2D node name
-	elif has_node("AnimatedSprite2D"):
-		$AnimatedSprite2D.play("default")
-		if not $AnimatedSprite2D.animation_finished.is_connected(_on_animation_finished):
-			$AnimatedSprite2D.animation_finished.connect(_on_animation_finished)
-
+	# Initial setup
 	start_x = position.x
 	start_y = position.y
 	initial_scale = scale * 1.5 # Overall scale increase by 50%
 	max_health = health
 	
 	if movement_type == MovementType.RAVEN:
-		# For Raven, we can either change the animation or just keep using AnimatedSprite2D
-		# If you have a 'raven' animation, you could play it here:
-		# if $AnimatedSprite2D.sprite_frames.has_animation("raven"):
-		#     $AnimatedSprite2D.play("raven")
-		
-		# Set initial target and direction
 		_update_raven_target()
 		raven_direction = (raven_target_pos - position).normalized()
-		
-		# Determine sidestep direction (move towards center of lane)
 		var lane_center = 400.0 if position.x < 800 else 1200.0
 		raven_sidestep_dir = 1.0 if position.x < lane_center else -1.0
 	
+	# Ensure correct sprite is active and playing
 	update_visuals()
+	var active_sprite = _get_active_sprite()
+	if active_sprite is AnimatedSprite2D:
+		active_sprite.play("default")
+		if not active_sprite.animation_finished.is_connected(_on_animation_finished):
+			active_sprite.animation_finished.connect(_on_animation_finished)
 
 	# Determine lane based on position
 	player_lane = 1 if position.x < 800 else 2
@@ -100,7 +88,9 @@ func _process(delta):
 
 	match movement_type:
 		MovementType.STRAIGHT:
-			position.y += speed * delta
+			# Apply slight acceleration for STRAIGHT type
+			var current_speed = speed + (t * 50.0) 
+			position.y += current_speed * delta
 		MovementType.SINE:
 			position.y += speed * delta
 			position.x = start_x + sin(t * frequency) * amplitude
@@ -124,22 +114,28 @@ func _apply_separation(delta):
 	# Simple separation logic to prevent enemies from overlapping
 	var enemies = get_tree().get_nodes_in_group("enemies")
 	var push_vector = Vector2.ZERO
-	var separation_dist = 60.0 # Distance at which enemies start pushing each other
-	var push_strength = 200.0 # Force of the push
+	var separation_dist = 80.0 # Increased from 60 to give more personal space
+	var push_strength = 250.0 # Slightly increased
 	
 	for other in enemies:
 		if other == self or not is_instance_valid(other):
 			continue
 			
-		# Only separate within the same lane to avoid cross-lane forces
+		# Only separate within the same lane
 		if other.player_lane != self.player_lane:
 			continue
 			
 		var dist = global_position.distance_to(other.global_position)
 		if dist < separation_dist and dist > 0:
-			# Calculate push direction (away from other)
 			var diff = global_position - other.global_position
-			push_vector += diff.normalized() * (1.0 - dist / separation_dist)
+			var dir = diff.normalized()
+			
+			# Horizontal push is always active
+			push_vector.x += dir.x * (1.0 - dist / separation_dist)
+			
+			# Vertical push is much weaker to prevent the "acceleration train" effect
+			# but still exists to help minor overlaps
+			push_vector.y += dir.y * (1.0 - dist / separation_dist) * 0.2
 			
 	if push_vector != Vector2.ZERO:
 		position += push_vector * push_strength * delta
@@ -204,16 +200,48 @@ func _process_raven_movement(delta):
 			if position.y > cam_y + 600 or position.x < -300 or position.x > 1900:
 				queue_free()
 
-func update_visuals():
-	var sprite = get_node_or_null("body")
-	if not sprite:
-		sprite = get_node_or_null("AnimatedSprite2D")
+func _get_active_sprite():
+	# Explicitly map movement types to sprites
+	var m_type = int(movement_type)
+	
+	if m_type == 0 or m_type == 1: # STRAIGHT (0) or SINE (1)
+		if has_node("yuren"):
+			return $yuren
+	else: # All other types (ZIGZAG, CIRCLE, RAVEN)
+		if has_node("niaoren"):
+			return $niaoren
+			
+	# Fallback chain
+	if has_node("niaoren"): return $niaoren
+	if has_node("yuren"): return $yuren
+	if has_node("body"): return $body
+	if has_node("AnimatedSprite2D"): return $AnimatedSprite2D
 		
+	return null
+
+func update_visuals():
+	var sprite = _get_active_sprite()
 	if is_dying or not sprite:
 		return
 	
+	# Hide all possible sprite nodes first to be absolutely sure
+	if has_node("yuren"): $yuren.visible = false
+	if has_node("niaoren"): $niaoren.visible = false
+	if has_node("body"): $body.visible = false
+	if has_node("AnimatedSprite2D"): $AnimatedSprite2D.visible = false
+	
+	# Show the active one
+	sprite.visible = true
+
+	# Reset root node modulate to avoid tinting all sprites
+	self.modulate = Color.WHITE
+	
+	# Ensure the active sprite is fully opaque
+	sprite.modulate.a = 1.0
+	sprite.self_modulate.a = 1.0
+	
 	# Ensure default animation is playing if available
-	if sprite.sprite_frames.has_animation("default"):
+	if sprite is AnimatedSprite2D and sprite.sprite_frames.has_animation("default"):
 		if sprite.animation != "default":
 			sprite.play("default")
 
@@ -247,6 +275,15 @@ func update_visuals():
 		scale = initial_scale
 
 func take_damage(amount, source_player_id: int = 0, current_combo: int = 0):
+	# Check if enemy is actually on screen before allowing damage
+	var main = get_tree().root.find_child("Main", true, false)
+	if main and main.world:
+		var cam_y = main.world.camera_y
+		# A generous buffer: only take damage if within 450 pixels of camera center
+		# (Screen height is 800, so 400 is the edge, 450 allows just-entering enemies)
+		if abs(global_position.y - cam_y) > 450:
+			return
+
 	if is_bubble:
 		is_bubble = false
 		update_visuals()
@@ -259,8 +296,7 @@ func take_damage(amount, source_player_id: int = 0, current_combo: int = 0):
 	update_visuals()
 
 	# Damage flash
-	var sprite = get_node_or_null("body")
-	if not sprite: sprite = get_node_or_null("AnimatedSprite2D")
+	var sprite = _get_active_sprite()
 	if not sprite: sprite = self
 	
 	var flash_tween = create_tween()
@@ -278,8 +314,7 @@ func take_damage(amount, source_player_id: int = 0, current_combo: int = 0):
 		collision_mask = 0
 		
 		# Stop any active damage flashes
-		var anim_sprite = get_node_or_null("body")
-		if not anim_sprite: anim_sprite = get_node_or_null("AnimatedSprite2D")
+		var anim_sprite = _get_active_sprite()
 		if not anim_sprite: anim_sprite = self
 		
 		anim_sprite.modulate = Color.WHITE
@@ -304,9 +339,8 @@ func take_damage(amount, source_player_id: int = 0, current_combo: int = 0):
 
 func _on_animation_finished():
 	if is_dying:
-		var sprite = get_node_or_null("body")
-		if not sprite: sprite = get_node_or_null("AnimatedSprite2D")
-		if sprite:
+		var sprite = _get_active_sprite()
+		if sprite is AnimatedSprite2D:
 			var anim_name = sprite.animation
 			if anim_name == "destroy" or anim_name == "destory":
 				_finalize_death(death_source_player_id, death_current_combo)
