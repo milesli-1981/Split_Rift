@@ -482,9 +482,9 @@ extractVideoFramesBtn.onclick = async () => {
 
 // --- Composer Logic ---
 
-function renderComposer() {
+function renderComposer(forExport = false) {
     compCtx.clearRect(0, 0, 1024, 1024);
-    if (gridToggle.checked) {
+    if (gridToggle.checked && !forExport) {
         compCtx.strokeStyle = '#333';
         compCtx.lineWidth = 1;
         for (let i = 0; i <= 1024; i += 64) {
@@ -501,14 +501,16 @@ function renderComposer() {
         if (!f.visible) compCtx.globalAlpha = 0.2; // Dim hidden frames
         compCtx.drawImage(f.canvas, f.x, f.y, fw, fh);
         
-        // Draw Anchor
-        compCtx.fillStyle = 'red';
-        compCtx.beginPath();
-        compCtx.arc(f.x + f.anchorX * f.scale, f.y + f.anchorY * f.scale, 4, 0, Math.PI * 2);
-        compCtx.fill();
+        // Draw Anchor (ONLY if not exporting)
+        if (!forExport) {
+            compCtx.fillStyle = 'red';
+            compCtx.beginPath();
+            compCtx.arc(f.x + f.anchorX * f.scale, f.y + f.anchorY * f.scale, 4, 0, Math.PI * 2);
+            compCtx.fill();
+        }
         compCtx.restore();
 
-        if (i === selectedFrameIndex) {
+        if (i === selectedFrameIndex && !forExport) {
             compCtx.strokeStyle = '#0078d4';
             compCtx.lineWidth = 2;
             compCtx.strokeRect(f.x, f.y, fw, fh);
@@ -640,25 +642,15 @@ requestAnimationFrame(animate);
 fpsSlider.oninput = () => fpsVal.textContent = fpsSlider.value;
 
 downloadSheetBtn.onclick = () => {
-    // 1. Temporarily disable grid for a clean export
-    const wasGridChecked = gridToggle.checked;
-    gridToggle.checked = false;
+    // 1. Render the "Clean" version for export (this will hide grid, anchors, and selection)
+    renderComposer(true);
     
-    // 2. Temporarily clear selection
-    const prevSelectedIndex = selectedFrameIndex;
-    selectedFrameIndex = -1;
-    
-    // 3. Render the "Clean" version to the canvas
-    renderComposer();
-    
-    // 4. Download
+    // 2. Download
     const link = document.createElement('a');
     link.download = 'spritesheet_master.png';
     link.href = composerCanvas.toDataURL();
     link.click();
     
-    // 5. Restore UI state
-    gridToggle.checked = wasGridChecked;
-    selectedFrameIndex = prevSelectedIndex;
-    renderComposer();
+    // 3. Restore UI state
+    renderComposer(false);
 };

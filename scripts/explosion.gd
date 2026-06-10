@@ -8,19 +8,14 @@ var source_player_id: int = 0
 var combo_count: int = 0
 
 func _ready():
-	# Visual effect: Simple expansion and fade out
-	var tween = create_tween()
-	tween.set_parallel(true)
-	tween.tween_property(self, "scale", Vector2(explosion_scale, explosion_scale), lifetime).from(Vector2(0.5, 0.5))
-	tween.tween_property(self, "modulate", Color(2.0, 1.5, 0.5, 0.0), lifetime).from(Color(1.0, 0.6, 0.0, 1.0))
-
-	# Wait a tiny bit for the expansion to cover area before checking damage
-	await get_tree().create_timer(0.05).timeout
+	# Visual effect removed as requested (only damage remains)
+	visible = false
+	
+	# Match the collision shape radius * scale for immediate check
 	_apply_damage()
 
-	# Self-destruct after animation
-	await tween.finished
-	queue_free()
+	# Self-destruct after a very short time (just enough to process collisions)
+	get_tree().create_timer(0.1).timeout.connect(queue_free)
 
 func _apply_damage():
 	# Use a circle query to be more reliable than get_overlapping_areas

@@ -30,6 +30,9 @@ var player_lane: int = 1 # 1 for P1's side, 2 for P2's side
 var is_fever_ball: bool = false
 var is_bubble: bool = false # NEW: Is wrapped in a bubble
 var is_death: bool = false # NEW: Is the Grim Reaper
+var is_dying: bool = false # NEW: Is playing destroy animation
+var death_source_player_id: int = 0
+var death_current_combo: int = 0
 
 func _ready():
 	add_to_group("enemies")
@@ -37,9 +40,16 @@ func _ready():
 	if has_node("ColorRect"):
 		$ColorRect.visible = false
 	
-	# Start animation
-	if has_node("AnimatedSprite2D"):
+	# Start animation on 'body' node
+	if has_node("body"):
+		$body.play("default")
+		if not $body.animation_finished.is_connected(_on_animation_finished):
+			$body.animation_finished.connect(_on_animation_finished)
+	# Backward compatibility for old AnimatedSprite2D node name
+	elif has_node("AnimatedSprite2D"):
 		$AnimatedSprite2D.play("default")
+		if not $AnimatedSprite2D.animation_finished.is_connected(_on_animation_finished):
+			$AnimatedSprite2D.animation_finished.connect(_on_animation_finished)
 
 	start_x = position.x
 	start_y = position.y
@@ -77,6 +87,9 @@ func _update_raven_target():
 		raven_target_pos = Vector2(400 if player_lane == 1 else 1200, 700)
 
 func _process(delta):
+	if is_dying:
+		return
+		
 	time_passed += delta
 
 	# Only move after spawn offset delay
@@ -192,10 +205,17 @@ func _process_raven_movement(delta):
 				queue_free()
 
 func update_visuals():
-	if not has_node("AnimatedSprite2D"):
-		return
+	var sprite = get_node_or_null("body")
+	if not sprite:
+		sprite = get_node_or_null("AnimatedSprite2D")
 		
-	var sprite = $AnimatedSprite2D
+	if is_dying or not sprite:
+		return
+	
+	# Ensure default animation is playing if available
+	if sprite.sprite_frames.has_animation("default"):
+		if sprite.animation != "default":
+			sprite.play("default")
 
 	if is_bubble:
 		sprite.modulate = Color(0.7, 0.9, 1.0, 1.0) # Light blue, but opaque
@@ -239,27 +259,78 @@ func take_damage(amount, source_player_id: int = 0, current_combo: int = 0):
 	update_visuals()
 
 	# Damage flash
-	var sprite = $AnimatedSprite2D if has_node("AnimatedSprite2D") else self
+	var sprite = get_node_or_null("body")
+	if not sprite: sprite = get_node_or_null("AnimatedSprite2D")
+	if not sprite: sprite = self
+	
 	var flash_tween = create_tween()
 	flash_tween.tween_property(sprite, "modulate", Color(5.0, 5.0, 5.0), 0.05)
 	flash_tween.chain().tween_callback(update_visuals)
 
 	if health <= 0:
-		# Notify player for energy gain
-		var main = get_tree().root.find_child("Main", true, false)
-		if main:
-			var player = main.get_player(source_player_id)
-			if player and player.has_method("gain_energy"):
-				var gain = 2.0 # Increased from 1.0 to 2.0 for faster testing
-				if player.has_method("is_in_fever") and player.is_in_fever():
-					gain *= 2.0
-				player.gain_energy(gain)
+		is_dying = true
+		death_source_player_id = source_player_id
+		death_current_combo = current_combo
+		
+		# Stop any movement and collisions
+		set_physics_process(false)
+		collision_layer = 0
+		collision_mask = 0
+		
+		# Stop any active damage flashes
+		var anim_sprite = get_node_or_null("body")
+		if not anim_sprite: anim_sprite = get_node_or_null("AnimatedSprite2D")
+		if not anim_sprite: anim_sprite = self
+		
+		anim_sprite.modulate = Color.WHITE
+		# Keep current scale instead of resetting to initial_scale
+		# scale = initial_scale 
+		
+		# Play destroy animation
+		if anim_sprite is AnimatedSprite2D:
+			var anims = anim_sprite.sprite_frames
+			if anims.has_animation("destroy"):
+				anim_sprite.animation = "destroy"
+				anim_sprite.sprite_frames.set_animation_loop("destroy", false)
+				anim_sprite.play("destroy")
+			elif anims.has_animation("destory"): # Support typo
+				anim_sprite.animation = "destory"
+				anim_sprite.sprite_frames.set_animation_loop("destory", false)
+				anim_sprite.play("destory")
+			else:
+				_finalize_death(source_player_id, current_combo)
+		else:
+			_finalize_death(source_player_id, current_combo)
 
-				if is_fever_ball:
-					player.fever_time = 10.0 # 10 seconds of fever
+func _on_animation_finished():
+	if is_dying:
+		var sprite = get_node_or_null("body")
+		if not sprite: sprite = get_node_or_null("AnimatedSprite2D")
+		if sprite:
+			var anim_name = sprite.animation
+			if anim_name == "destroy" or anim_name == "destory":
+				_finalize_death(death_source_player_id, death_current_combo)
 
-		explode(source_player_id, current_combo + 1)
-		queue_free()
+func _finalize_death(source_player_id: int = 0, current_combo: int = 0):
+	# Notify player for energy gain
+	var main = get_tree().root.find_child("Main", true, false)
+	if main:
+		var player = main.get_player(source_player_id)
+		if player and player.has_method("gain_energy"):
+			var gain = 2.0 # Increased from 1.0 to 2.0 for faster testing
+			if player.has_method("is_in_fever") and player.is_in_fever():
+				gain *= 2.0
+			player.gain_energy(gain)
+
+			if is_fever_ball:
+				player.fever_time = 10.0 # 10 seconds of fever
+
+	# Update HUD combo display and trigger fireballs
+	if main and main.has_method("update_player_combo"):
+		main.update_player_combo(source_player_id, current_combo + 1, global_position)
+
+	explode(source_player_id, current_combo + 1)
+	queue_free()
 
 func explode(source_player_id: int, combo_count: int):
 	if explosion_scene:
@@ -278,13 +349,6 @@ func explode(source_player_id: int, combo_count: int):
 			explosion.explosion_scale = power
 
 		get_parent().add_child(explosion)
-
-		# Update HUD combo display and trigger fireballs
-		var main = get_tree().root.find_child("Main", true, false)
-		if main and main.has_method("update_player_combo"):
-			main.update_player_combo(source_player_id, combo_count, global_position)
-
-		queue_free()
 
 func _on_body_entered(body):
 	if body.is_in_group("players"):
