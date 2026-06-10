@@ -88,8 +88,8 @@ func _process(delta):
 
 	match movement_type:
 		MovementType.STRAIGHT:
-			# Apply slight acceleration for STRAIGHT type
-			var current_speed = speed + (t * 50.0) 
+			# Apply significant acceleration for STRAIGHT type
+			var current_speed = speed + (t * 200.0) 
 			position.y += current_speed * delta
 		MovementType.SINE:
 			position.y += speed * delta
@@ -224,55 +224,50 @@ func update_visuals():
 	if is_dying or not sprite:
 		return
 	
-	# Hide all possible sprite nodes first to be absolutely sure
+	# Hide all possible sprite nodes and extra visuals
 	if has_node("yuren"): $yuren.visible = false
 	if has_node("niaoren"): $niaoren.visible = false
 	if has_node("body"): $body.visible = false
 	if has_node("AnimatedSprite2D"): $AnimatedSprite2D.visible = false
+	if has_node("Shadow"): $Shadow.visible = false # Hide the Polygon2D shadow too
 	
-	# Show the active one
+	# Show ONLY the active one
 	sprite.visible = true
 
-	# Reset root node modulate to avoid tinting all sprites
+	# Reset all modulations to pure white to prevent blue stacking/tinting
 	self.modulate = Color.WHITE
+	self.self_modulate = Color.WHITE
+	sprite.modulate = Color.WHITE
+	sprite.self_modulate = Color.WHITE
 	
 	# Ensure the active sprite is fully opaque
 	sprite.modulate.a = 1.0
-	sprite.self_modulate.a = 1.0
 	
-	# Ensure default animation is playing if available
+	# Ensure default animation is playing
 	if sprite is AnimatedSprite2D and sprite.sprite_frames.has_animation("default"):
 		if sprite.animation != "default":
 			sprite.play("default")
 
+	# Apply special status visuals
 	if is_bubble:
-		sprite.modulate = Color(0.7, 0.9, 1.0, 1.0) # Light blue, but opaque
-		scale = initial_scale * 1.3
-		return
-
-	if is_fever_ball:
-		sprite.modulate = Color(0, 0.5, 1) # Keep blue
-	else:
-		# Red: 1, Yellow: 2, Green: 3, Blue: 4, Purple: 5
-		# Commented out health-based coloring as requested
-		# var color = Color.WHITE
-		# match health:
-		# 	1: color = Color(1, 0.2, 0.2) # Red
-		# 	2: color = Color(1, 1, 0.2)   # Yellow
-		# 	3: color = Color(0.2, 1, 0.2) # Green
-		# 	4: color = Color(0.2, 0.5, 1) # Blue
-		# 	5: color = Color(0.8, 0.2, 1) # Purple
-		# sprite.modulate = color
-		sprite.modulate = Color.WHITE
+		# Use self_modulate for bubble to avoid affecting child/parent stacking if any
+		sprite.modulate = Color(0.7, 0.9, 1.0, 1.0) 
+		# Don't return here! Continue to apply scaling logic below
+	elif is_fever_ball:
+		sprite.modulate = Color(0, 0.5, 1)
 
 	# Visual feedback: scale down based on health
 	var scale_factor = 0.5 + (float(health) / 5.0) * 0.5
-	scale = initial_scale * scale_factor
+	var final_scale = initial_scale * scale_factor
 	
-	# Special handling for Raven if needed
+	if is_bubble:
+		final_scale *= 1.3
+		
+	# Apply final scale
 	if movement_type == MovementType.RAVEN:
-		# Keep initial scale
 		scale = initial_scale
+	else:
+		scale = final_scale
 
 func take_damage(amount, source_player_id: int = 0, current_combo: int = 0):
 	# Check if enemy is actually on screen before allowing damage

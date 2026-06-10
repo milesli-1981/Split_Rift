@@ -177,8 +177,8 @@ func spawn_formation(type, x_pos):
 
 	# Specialized parameters for STRAIGHT
 	if type == 0:
-		base_group_size = 8 # More enemies
-		delay_between = 0.3 # Tighter packing
+		base_group_size = 12 # More enemies
+		delay_between = 0.25 # Even tighter packing
 	
 	for i in range(base_group_size):
 		var enemy = enemy_scene.instantiate()
@@ -188,17 +188,19 @@ func spawn_formation(type, x_pos):
 		else:
 			enemy.health = randi_range(2, 4)
 
-		# Chance to be in a bubble (reduced for STRAIGHT to keep it clean)
-		var bubble_chance = 0.1 if type == 0 else 0.2
+		# Chance to be in a bubble (EXTREMELY reduced for STRAIGHT to avoid blue issues)
+		var bubble_chance = 0.05 if type == 0 else 0.2
 		if randf() < bubble_chance:
 			enemy.is_bubble = true
 
-		enemy.position = Vector2(x_pos, camera_y - 500)
+		# Add a tiny bit of random horizontal offset to prevent perfect overlap at start
+		var spawn_x = x_pos + randf_range(-10, 10)
+		enemy.position = Vector2(spawn_x, camera_y - 500)
 		
 		match type:
 			0: # STRAIGHT
 				enemy.movement_type = 0
-				enemy.speed = 280.0 # Much faster
+				enemy.speed = 320.0 # Faster initial speed
 				enemy.spawn_offset = i * delay_between
 			1: # SINE
 				enemy.movement_type = 1
