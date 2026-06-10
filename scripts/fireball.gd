@@ -32,10 +32,6 @@ func update_visuals():
 		if anim.sprite_frames and anim.sprite_frames.has_animation("default"):
 			anim.sprite_frames.set_animation_loop("default", true)
 		anim.play("default")
-	
-	var shadow = get_node_or_null("Shadow")
-	if shadow:
-		shadow.visible = true
 
 	# 鍒濆澶у皬涓嶇缉鏀?(Level 1 = 1.0)锛屼箣鍚庢瘡绾у鍔?15%
 	var level_scale = 1.0 + (level - 1) * 0.15

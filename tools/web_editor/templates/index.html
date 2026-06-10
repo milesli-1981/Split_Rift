@@ -3,36 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sprite 像素级编辑器</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <title>Sprite Master - 统一精灵编辑器</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Sprite 像素级编辑器</h1>
-            <p>手动清除残留像素，保护画面主体</p>
+            <h1>Sprite Master</h1>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="editor">1. 切片与去底 (Editor)</button>
+                <button class="tab-btn" data-tab="video">2. 视频转精灵 (Video)</button>
+                <button class="tab-btn" data-tab="composer">3. 精灵拼版 (Composer)</button>
+            </div>
         </header>
 
-        <div class="toolbar">
-            <input type="file" id="fileInput" accept="image/*">
-            <div class="controls">
-                <label>容差: <input type="number" id="tolerance" value="20" min="0" max="255"></label>
-                <button id="autoCleanBtn" class="btn primary">自动去底</button>
+        <!-- View 1: Editor -->
+        <div id="editorView" class="tab-content active">
+            <div class="toolbar">
+                <div class="controls">
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                    <button class="btn secondary" onclick="document.getElementById('fileInput').click()">上传原始图</button>
+                    <div class="divider"></div>
+                    <label>去底容差: </label>
+                    <input type="range" id="tolerance" value="0" min="0" max="150" style="width: 120px;">
+                    <span id="toleranceVal">0</span>
+                </div>
                 <div class="divider"></div>
-                <button id="eraserBtn" class="btn tool">橡皮擦</button>
-                <label>大小: <input type="range" id="brushSize" min="1" max="50" value="10"></label>
+                <div class="controls">
+                    <button id="eraserBtn" class="btn tool">橡皮擦</button>
+                    <button id="selectBtn" class="btn tool">矩形框选</button>
+                    <button id="undoBtn" class="btn secondary" title="Ctrl+Z">撤销</button>
+                    <label>大小: </label>
+                    <input type="range" id="brushSize" min="1" max="50" value="10" style="width: 80px;">
+                </div>
                 <div class="divider"></div>
-                <button id="saveBtn" class="btn success">应用并保存</button>
-                <button id="downloadBtn" class="btn">导出 PNG</button>
+                <div class="controls">
+                    <button id="sliceBtn" class="btn primary" disabled>切片并加入 Collection</button>
+                </div>
+                <div class="divider"></div>
+                <div class="controls" style="margin-left: auto;">
+                    <button id="applyChangesBtn" class="btn success">应用更改并保存至 Collection</button>
+                    <button id="downloadEditorBtn" class="btn secondary">导出当前 PNG</button>
+                </div>
+            </div>
+
+            <div class="editor-layout">
+                <div class="main-view">
+                    <div class="canvas-container">
+                        <canvas id="editorCanvas"></canvas>
+                    </div>
+                </div>
+                <div class="sidebar">
+                    <div class="panel">
+                        <h3>Collection (切好的帧)</h3>
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            <ul id="collectionList" class="frame-list">
+                                <!-- Slices will appear here -->
+                            </ul>
+                        </div>
+                        <div style="margin-top: 15px; display: flex; gap: 5px;">
+                            <button id="clearCollectionBtn" class="btn danger" style="flex: 1;">清空 Collection</button>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <h3>操作说明</h3>
+                        <p style="font-size: 12px; line-height: 1.6; color: #aaa; margin: 0;">
+                            1. 上传图片<br>
+                            2. 调整滑块实时去底<br>
+                            3. 使用橡皮擦精修 (Ctrl+Z 撤销)<br>
+                            4. 矩形框选素材，点击“切片”加入 Collection
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="editor-area">
-            <div class="canvas-container">
-                <canvas id="editorCanvas"></canvas>
+        <!-- View 2: Video to Sprite -->
+        <div id="videoView" class="tab-content">
+            <div class="toolbar">
+                <div class="controls">
+                    <input type="file" id="videoFileInput" accept="video/*" style="display: none;">
+                    <button class="btn secondary" onclick="document.getElementById('videoFileInput').click()">选择视频文件</button>
+                </div>
+                <div class="divider"></div>
+                <div class="controls">
+                    <label>每秒帧数 (FPS): </label>
+                    <input type="number" id="videoFps" value="10" min="1" max="60" class="numeric-input">
+                </div>
+                <div class="divider"></div>
+                <div class="controls">
+                    <button id="extractVideoFramesBtn" class="btn primary" disabled>提取并加入 Collection</button>
+                </div>
+            </div>
+            
+            <div class="editor-layout">
+                <div class="main-view" style="flex-direction: column; align-items: center;">
+                    <video id="videoPreview" controls style="max-width: 100%; max-height: 500px; background: #000;"></video>
+                    <div style="margin-top: 20px; width: 100%; max-width: 600px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <span>片段选择 (秒):</span>
+                            <span id="videoTimeRangeDisplay">0.0s - 0.0s</span>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <input type="number" id="videoStart" step="0.1" value="0.0" class="numeric-input">
+                            <span>至</span>
+                            <input type="number" id="videoEnd" step="0.1" value="0.0" class="numeric-input">
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar">
+                    <div class="panel">
+                        <h3>处理说明</h3>
+                        <p style="font-size: 12px; line-height: 1.6; color: #aaa; margin: 0;">
+                            1. 上传 MP4/WebM 视频<br>
+                            2. 拖动进度条确定开始/结束秒数<br>
+                            3. 设定 FPS (每秒提取几张图)<br>
+                            4. 点击提取，所有帧将自动进入 Collection<br>
+                            5. 提示：提取后可去 Editor 进行批量去底
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View 3: Composer -->
+        <div id="composerView" class="tab-content">
+            <div class="toolbar">
+                <div class="controls">
+                    <label><input type="checkbox" id="gridToggle" checked> 显示网格</label>
+                    <div class="divider"></div>
+                    <label>对齐列数: </label>
+                    <select id="gridColsSelect" class="numeric-input">
+                        <option value="4" selected>4</option>
+                        <option value="6">6</option>
+                        <option value="8">8</option>
+                        <option value="10">10</option>
+                    </select>
+                    <button id="autoAlignBtn" class="btn primary">一键对齐网格</button>
+                </div>
+                <div class="divider"></div>
+                <div class="controls">
+                    <button id="deleteFrameBtn" class="btn danger" disabled>删除选中帧</button>
+                </div>
+                <div class="divider"></div>
+                <div class="controls" style="margin-left: auto;">
+                    <button id="downloadSheetBtn" class="btn success">下载拼版结果 PNG</button>
+                </div>
+            </div>
+
+            <div class="composer-layout">
+                <div class="main-view">
+                    <div class="canvas-container">
+                        <canvas id="composerCanvas" width="1024" height="1024"></canvas>
+                    </div>
+                </div>
+                <div class="sidebar">
+                    <div class="panel">
+                        <h3>动画预览</h3>
+                        <div class="preview-box">
+                            <canvas id="previewCanvas" width="256" height="256"></canvas>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <label>预览 FPS: <span id="fpsVal">10</span></label>
+                            <input type="range" id="fpsSlider" min="1" max="60" value="10">
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <h3>帧列表</h3>
+                        <div class="frame-list">
+                            <ul id="composerFrameList" class="frame-list"></ul>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <h3>帧属性</h3>
+                        <div id="framePropsPanel" style="display: none;">
+                            <label>缩放比例: <span id="frameScaleVal">1.00</span></label>
+                            <input type="range" id="frameScaleSlider" min="0.01" max="5.00" step="0.01" value="1.00">
+                            <p style="font-size: 11px; color: #888; margin-top: 10px;">
+                                * 点击帧内部可设置锚点(红点)<br>
+                                * 拖拽边缘可移动位置
+                            </p>
+                        </div>
+                        <p id="noFrameSelectedHint" style="font-size: 12px; color: #888; text-align: center;">请在画布中选择一个帧</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <script src="/static/script.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

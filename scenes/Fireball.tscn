@@ -88,6 +88,6 @@ shape = SubResource("CircleShape2D_fireball")
 position = Vector2(-11, -1)
 scale = Vector2(0.55711067, 0.512031)
 sprite_frames = SubResource("SpriteFrames_bl534")
-frame_progress = 0.87365746
+frame_progress = 0.0056976373
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

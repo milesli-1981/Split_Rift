@@ -128,19 +128,52 @@ func _spawn_special_enemy(is_fever: bool, is_death: bool):
 
 func _on_spawn_timer_timeout():
 	# Randomly pick a formation type
-	var formation_type = randi() % 4
+	var formation_type = randi() % 5 # Increased to 5 to include RAVEN
 
-	# Spawn for Lane 1 (centered on Lane 1)
-	spawn_formation(formation_type, randf_range(lane_width * 0.2, lane_width * 0.8))
-	# Spawn for Lane 2 (centered on Lane 2, which starts at 800)
-	spawn_formation(formation_type, 800.0 + randf_range(lane_width * 0.2, lane_width * 0.8))
+	if formation_type == 4:
+		# Special RAVEN formation
+		spawn_raven_formation(0.0) # Lane 1
+		spawn_raven_formation(800.0) # Lane 2
+	else:
+		# Spawn for Lane 1 (centered on Lane 1)
+		spawn_formation(formation_type, randf_range(lane_width * 0.2, lane_width * 0.8))
+		# Spawn for Lane 2 (centered on Lane 2, which starts at 800)
+		spawn_formation(formation_type, 800.0 + randf_range(lane_width * 0.2, lane_width * 0.8))
 
-	# Randomize next spawn time between 1.5 and 3.0 seconds to keep intensity
-	$SpawnTimer.wait_time = randf_range(1.5, 3.0)
+	# Randomize next spawn time between 5.0 and 8.0 seconds to reduce frequency
+	$SpawnTimer.wait_time = randf_range(5.0, 8.0)
+
+func spawn_raven_formation(x_offset):
+	var group_size = 1 # Reduced from 2
+	var delay_between = 0.5
+	
+	# Left side group
+	for i in range(group_size):
+		var enemy = enemy_scene.instantiate()
+		enemy.movement_type = 4 # RAVEN
+		enemy.health = 3
+		enemy.speed = 180.0
+		# Added small random X offset to prevent perfect overlap on spawn
+		var start_x = x_offset + lane_width * 0.1 + randf_range(-30, 30)
+		enemy.position = Vector2(start_x, camera_y - 500)
+		enemy.spawn_offset = i * delay_between
+		add_child(enemy)
+		
+	# Right side group
+	for i in range(group_size):
+		var enemy = enemy_scene.instantiate()
+		enemy.movement_type = 4 # RAVEN
+		enemy.health = 3
+		enemy.speed = 180.0
+		# Added small random X offset
+		var start_x = x_offset + lane_width * 0.9 + randf_range(-30, 30)
+		enemy.position = Vector2(start_x, camera_y - 500)
+		enemy.spawn_offset = i * delay_between
+		add_child(enemy)
 
 func spawn_formation(type, x_pos):
-	var group_size = 8
-	var delay_between = 0.3
+	var group_size = 5 # Reduced from 8
+	var delay_between = 0.4 # Slightly increased delay
 
 	for i in range(group_size):
 		var enemy = enemy_scene.instantiate()

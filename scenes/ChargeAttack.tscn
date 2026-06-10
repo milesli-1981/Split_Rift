@@ -1,10 +1,10 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=10 format=3 uid="uid://b15hp463hf53q"]
 
-[ext_resource type="Script" path="res://scripts/charge_attack.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://素材/effects/charge_attack.png" id="2_07jra"]
+[ext_resource type="Script" uid="uid://b14x7s71x7bxe" path="res://scripts/charge_attack.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cbtvncfn65i0v" path="res://素材/effects/charge_attack.png" id="2_07jra"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_charge"]
-size = Vector2(83.25, 182.75)
+size = Vector2(61.25, 164)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_dvbq5"]
 atlas = ExtResource("2_07jra")
@@ -53,7 +53,7 @@ animations = [{
 script = ExtResource("1_script")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-0.625, 0.375)
+position = Vector2(-0.625, 0)
 shape = SubResource("RectangleShape2D_charge")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
