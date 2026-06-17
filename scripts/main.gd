@@ -32,7 +32,10 @@ func _ready():
 	camera1.enabled = true
 	camera2.enabled = true
 
-	# Set player boundaries and initial positions
+	# Dynamically setup players based on selection
+	_setup_players()
+
+	# Get the currently active player nodes (could be the originals or the new ones)
 	var p1 = world.get_node_or_null("Player1")
 	var p2 = world.get_node_or_null("Player2")
 
@@ -66,7 +69,6 @@ func _ready():
 		if world.has_method("update_lane_info"):
 			world.update_lane_info(v_width)
 
-	p1.scroll_speed = scroll_speed
 	p1.health_changed.connect(func(h): _on_player_health_changed(1, h))
 	p1.bombs_changed.connect(func(c): hud1.update_bombs(c))
 	p1.energy_changed.connect(func(lv, pct): hud1.update_energy(lv, pct))
@@ -78,6 +80,7 @@ func _ready():
 	hud1.set_layout_mirrored(false) # P1 portrait on left
 	
 	if p2:
+		p2.player_id = 2
 		p2.scroll_speed = scroll_speed
 		p2.is_ai = true # Set P2 to AI mode
 		p2.health_changed.connect(func(h): _on_player_health_changed(2, h))
@@ -89,6 +92,36 @@ func _ready():
 		hud2.update_energy(0, 0.0)
 		hud2.set_portrait(p2.character_data.get("portrait_path", ""))
 		hud2.set_layout_mirrored(true) # P2 portrait on right
+
+func _setup_players():
+	# Process P1
+	_replace_player_if_needed(1, CharacterManager.p1_choice)
+	# Process P2
+	_replace_player_if_needed(2, CharacterManager.p2_choice)
+
+func _replace_player_if_needed(id: int, char_key: String):
+	var data = CharacterManager.CHARACTERS.get(char_key, {})
+	var scene_path = data.get("character_scene_path", "")
+	
+	if scene_path != "" and ResourceLoader.exists(scene_path):
+		var old_player = world.get_node_or_null("Player" + str(id))
+		if old_player:
+			var pos = old_player.position
+			var parent = old_player.get_parent()
+			
+			# Rename old player to avoid name collision during replacement
+			old_player.name = "OldPlayer" + str(id)
+			old_player.queue_free()
+			
+			# Instantiate new player scene
+			var new_player_scene = load(scene_path)
+			var new_player = new_player_scene.instantiate()
+			new_player.name = "Player" + str(id)
+			new_player.player_id = id
+			new_player.position = pos
+			
+			parent.add_child(new_player)
+			print("Replaced Player", id, " with specialized scene: ", scene_path)
 
 func _process(delta):
 	# Update combos
@@ -210,6 +243,9 @@ func send_opponent_attack(target_id: int, type_str: String, source_pos: Vector2,
 		rift.target_id = target_id
 		rift.extra_type = type_str
 		rift.sender_player = sender_player
+		
+		# Ensure world node is valid
+		if not world: return
 		
 		var v_width = viewport1.size.x
 		var target_x_center = (v_width / 2.0) if target_id == 1 else (800.0 + v_width / 2.0)

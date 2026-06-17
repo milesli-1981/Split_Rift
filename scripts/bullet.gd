@@ -6,6 +6,7 @@ var player_id: int = 1
 var bullet_index: int = 0
 
 func _ready():
+	_setup_shadow()
 	if has_node("Sprite2D"):
 		var sprite = $Sprite2D
 		# 如果编辑器中没有设置纹理，才加载默认子弹图集
@@ -43,3 +44,26 @@ func _on_area_entered(area):
 
 		# 瀛愬脊纰版挒鍚庢秷澶?
 		queue_free()
+
+func _setup_shadow():
+	# Visual effect: Simple elliptical shadow for the bullet
+	var shadow = Polygon2D.new()
+	shadow.name = "BulletShadow"
+	
+	# Create an ellipse shape
+	var points = PackedVector2Array()
+	var segments = 12
+	var radius_x = 10.0
+	var radius_y = 5.0
+	for i in range(segments):
+		var angle = (float(i) / segments) * TAU
+		points.append(Vector2(cos(angle) * radius_x, sin(angle) * radius_y))
+	
+	shadow.polygon = points
+	shadow.color = Color(0, 0, 0, 0.3) # Semi-transparent black
+	shadow.z_index = -1 # Behind the bullet
+	
+	# Position the shadow slightly below the bullet
+	shadow.position = Vector2(0, 15)
+	
+	add_child(shadow)

@@ -42,8 +42,8 @@
                 </div>
                 <div class="divider"></div>
                 <div class="controls" style="margin-left: auto;">
-                    <button id="applyChangesBtn" class="btn success">应用更改并保存至 Collection</button>
-                    <button id="downloadEditorBtn" class="btn secondary">导出当前 PNG</button>
+                    <button id="downloadEditorBtn" class="btn success">下载当前处理图 (PNG)</button>
+                    <button id="applyChangesBtn" class="btn primary">应用更改并保存至 Collection</button>
                 </div>
             </div>
 
@@ -132,14 +132,15 @@
                 <div class="controls">
                     <label><input type="checkbox" id="gridToggle" checked> 显示网格</label>
                     <div class="divider"></div>
-                    <label>对齐列数: </label>
-                    <select id="gridColsSelect" class="numeric-input">
-                        <option value="4" selected>4</option>
-                        <option value="6">6</option>
-                        <option value="8">8</option>
-                        <option value="10">10</option>
-                    </select>
+                    <label>对齐行列: </label>
+                    <input type="number" id="gridColsInput" value="4" min="1" max="20" class="numeric-input" style="width: 45px;" title="列数">
+                    <span>x</span>
+                    <input type="number" id="gridRowsInput" value="4" min="1" max="20" class="numeric-input" style="width: 45px;" title="行数">
                     <button id="autoAlignBtn" class="btn primary">一键对齐网格</button>
+                    <div class="divider"></div>
+                    <label>全局缩放: <span id="globalScaleVal">1.00</span></label>
+                    <input type="range" id="globalScaleSlider" min="0.1" max="3.0" step="0.05" value="1.0" style="width: 100px;">
+                    <button id="applyGlobalScaleBtn" class="btn secondary">应用</button>
                 </div>
                 <div class="divider"></div>
                 <div class="controls">

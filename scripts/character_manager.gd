@@ -13,14 +13,15 @@ const CHARACTERS = {
 		"extra_type": "PLANE",
 		"color": Color(0.8, 0.9, 1.0),
 		"bullet_index": 18,
+		"character_scene_path": "res://scenes/Arthur.tscn",
 		"sprite_frames_path": "res://素材/characters/jianxiu/Arthur_SpriteFrames.tres",
 		"sprite_scale": Vector2(1.0, 1.0), # 基础缩放
 		"anim_speed": 0.15,
 		"frame_offsets": [],
 		"charge_visuals": {
 			"sprite_path": "res://素材/characters/jianxiu/charge_effect.png",
-			"hframes": 2,
-			"vframes": 2,
+			"hframes": 4,
+			"vframes": 4,
 			"scale_multiplier": 1.0,
 			"frame_offsets": [
 				Vector2(-30, 0),
@@ -32,6 +33,33 @@ const CHARACTERS = {
 			"vfx_rotate_speed": 2.0,
 			"release_cooldown": 0.5,
 			"release_anim_speed": 0.05
+		}
+	},
+	"nvgui": {
+		"display_name": "女鬼",
+		"portrait_path": "res://素材/ui/avatar_jianxiu.png",
+		"speed": 500.0,
+		"fire_rate": 0.2,
+		"charge_speed": 1.2,
+		"charge_type": "LASER",
+		"charge_desc": "幽冥光束：聚集阴气发射贯穿全屏的强力光束",
+		"extra_type": "PIG",
+		"color": Color(0.9, 0.9, 0.9),
+		"bullet_index": 4,
+		"character_scene_path": "res://scenes/Nvgui.tscn",
+		"sprite_frames_path": "res://素材/characters/nvgui/nvgui_SpriteFrames.tres",
+		"sprite_scale": Vector2(1.0, 1.0),
+		"anim_speed": 0.15,
+		"idle_sprite_path": "res://素材/characters/nvgui/idle.png",
+		"charge_visuals": {
+			"vfx_enabled": true,
+			"sprite_path": "res://素材/characters/nvgui/charge.png",
+			"hframes": 4,
+			"vframes": 4,
+			"scale_multiplier": 1.5,
+			"vfx_rotate_speed": 0.0, # Nvgui charge might not need rotation
+			"release_anim_speed": 0.05,
+			"release_cooldown": 0.8
 		}
 	},
 	"Sprites": {
@@ -94,6 +122,6 @@ const CHARACTERS = {
 	}
 }
 
-var p1_choice: String = "Ran"
-var p2_choice: String = "Arthur"
+var p1_choice: String = "Arthur"
+var p2_choice: String = "nvgui"
 var debug_mode: bool = false

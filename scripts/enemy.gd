@@ -21,7 +21,6 @@ var raven_target_pos: Vector2 = Vector2.ZERO
 var raven_direction: Vector2 = Vector2.ZERO # Added for directional movement
 var raven_sidestep_dir: float = 1.0
 var raven_timer: float = 0.0
-var raven_texture: Texture2D = preload("res://素材/monster/raven.png")
 
 # TSS Mechanics
 var initial_scale: Vector2 = Vector2.ONE
@@ -52,13 +51,18 @@ func _ready():
 		var lane_center = 400.0 if position.x < 800 else 1200.0
 		raven_sidestep_dir = 1.0 if position.x < lane_center else -1.0
 	
+	# Ensure all potential animated sprites are connected to the death logic
+	for sprite_name in ["niaoren", "yuren", "body", "AnimatedSprite2D"]:
+		if has_node(sprite_name):
+			var s = get_node(sprite_name)
+			if s is AnimatedSprite2D and not s.animation_finished.is_connected(_on_animation_finished):
+				s.animation_finished.connect(_on_animation_finished)
+	
 	# Ensure correct sprite is active and playing
 	update_visuals()
 	var active_sprite = _get_active_sprite()
 	if active_sprite is AnimatedSprite2D:
 		active_sprite.play("default")
-		if not active_sprite.animation_finished.is_connected(_on_animation_finished):
-			active_sprite.animation_finished.connect(_on_animation_finished)
 
 	# Determine lane based on position
 	player_lane = 1 if position.x < 800 else 2
@@ -221,7 +225,16 @@ func _get_active_sprite():
 
 func update_visuals():
 	var sprite = _get_active_sprite()
-	if is_dying or not sprite:
+	if not sprite:
+		return
+	
+	# Reset all modulations to pure white to prevent blue stacking/tinting
+	self.modulate = Color.WHITE
+	self.self_modulate = Color.WHITE
+	sprite.modulate = Color.WHITE
+	sprite.self_modulate = Color.WHITE
+
+	if is_dying:
 		return
 	
 	# Hide all possible sprite nodes and extra visuals
@@ -229,16 +242,10 @@ func update_visuals():
 	if has_node("niaoren"): $niaoren.visible = false
 	if has_node("body"): $body.visible = false
 	if has_node("AnimatedSprite2D"): $AnimatedSprite2D.visible = false
-	if has_node("Shadow"): $Shadow.visible = false # Hide the Polygon2D shadow too
+	if has_node("Shadow"): $Shadow.visible = true # Restore shadow visibility
 	
 	# Show ONLY the active one
 	sprite.visible = true
-
-	# Reset all modulations to pure white to prevent blue stacking/tinting
-	self.modulate = Color.WHITE
-	self.self_modulate = Color.WHITE
-	sprite.modulate = Color.WHITE
-	sprite.self_modulate = Color.WHITE
 	
 	# Ensure the active sprite is fully opaque
 	sprite.modulate.a = 1.0
@@ -308,13 +315,20 @@ func take_damage(amount, source_player_id: int = 0, current_combo: int = 0):
 		collision_layer = 0
 		collision_mask = 0
 		
-		# Stop any active damage flashes
+		# Stop any active damage flashes and tweens
 		var anim_sprite = _get_active_sprite()
 		if not anim_sprite: anim_sprite = self
 		
-		anim_sprite.modulate = Color.WHITE
-		# Keep current scale instead of resetting to initial_scale
-		# scale = initial_scale 
+		# Kill all active tweens on this object to stop the "glow" flash
+		var tweens = get_tree().get_processed_tweens()
+		for t in tweens:
+			if t.is_valid() and t.is_running():
+				# Unfortunately we can't easily check if a tween targets this specific object
+				# without more complex logic, but we can reset the modulate manually
+				pass
+		
+		# Force reset modulation and stop flash
+		update_visuals() 
 		
 		# Play destroy animation
 		if anim_sprite is AnimatedSprite2D:

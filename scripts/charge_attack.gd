@@ -42,23 +42,29 @@ func _ready():
 
 	# Initialization based on type
 	match type:
+		ChargePattern.WAVE:
+			z_index = 10
 		ChargePattern.SWARM:
+			z_index = 10
 			lifetime = 4.5
 			hits_left = 3
 			slow_speed = 400.0
 			fast_speed = 1500.0
 		ChargePattern.MINE:
+			z_index = 10
 			lifetime = 3.5
 			slow_speed = 0.0
 			fast_speed = 0.0
 		ChargePattern.SPIRAL:
+			z_index = 10
 			lifetime = 4.0
 			hits_left = 10
 			slow_speed = 300.0
 			fast_speed = 800.0
 		ChargePattern.LASER:
-			z_index = 5 # 位于玩家下方但背景上方
+			z_index = 15 # Ensure it's on top of players and enemies
 		ChargePattern.GROW:
+			z_index = 15
 			lifetime = 2.0
 			hits_left = 5
 			slow_speed = 450.0
@@ -79,14 +85,22 @@ func _ready():
 		animated_sprite.speed_scale = 1.0 # 恢复正常动画速度
 		animated_sprite.play("default")
 		animated_sprite.visible = true
+		# Ensure self.modulate is white so the sprite is visible
+		self.modulate = Color.WHITE
+		self.self_modulate = Color.WHITE
 
 	_setup_visuals()
 
 func _setup_visuals():
+	# Ensure visibility
+	visible = true
+	if animated_sprite: animated_sprite.visible = true
+	
 	match type:
 		ChargePattern.WAVE:
 			if polygon:
 				polygon.polygon = PackedVector2Array([Vector2(-200, 0), Vector2(200, 0), Vector2(240, -80), Vector2(-240, -80)])
+				polygon.visible = true
 			modulate = Color(0.4, 1.0, 1.0, 0.9)
 			if collision and collision.shape is RectangleShape2D:
 				collision.shape.size = Vector2(400, 80)
@@ -98,6 +112,7 @@ func _setup_visuals():
 		ChargePattern.MINE:
 			if polygon:
 				polygon.polygon = _create_circle_polygon(120, 32)
+				polygon.visible = true
 			modulate = Color(1.0, 0.4, 0.0, 0.8)
 			if collision and collision.shape:
 				var circle = CircleShape2D.new()
@@ -106,6 +121,7 @@ func _setup_visuals():
 		ChargePattern.SPIRAL:
 			if polygon:
 				polygon.polygon = _create_spiral_polygon(60, 24)
+				polygon.visible = true
 			modulate = Color(0.8, 0.2, 1.0, 0.9)
 			scale = base_root_scale * 1.5
 			if collision and collision.shape:
@@ -113,6 +129,8 @@ func _setup_visuals():
 				circle.radius = 60
 				collision.shape = circle
 		ChargePattern.SWARM:
+			if animated_sprite: animated_sprite.visible = true
+			if polygon: polygon.visible = false
 			scale = base_root_scale * 1.2
 			modulate = Color(1.0, 1.0, 0.2)
 			if collision and collision.shape is RectangleShape2D:

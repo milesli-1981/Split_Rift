@@ -1,7 +1,6 @@
-[gd_resource type="SpriteFrames" load_steps=12 format=3]
+[gd_resource type="SpriteFrames" load_steps=7 format=3 uid="uid://b7dvsdbqfvlsl"]
 
-[ext_resource type="Texture2D" path="res://素材/characters/jianxiu/idle.png" id="1_qu4a1"]
-[ext_resource type="Texture2D" path="res://素材/characters/jianxiu/charge_effect.png" id="2_charge"]
+[ext_resource type="Texture2D" uid="uid://b6o6bvadjvhh3" path="res://素材/characters/jianxiu/idle.png" id="1_qu4a1"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_1"]
 atlas = ExtResource("1_qu4a1")
@@ -22,22 +21,6 @@ region = Rect2(768, 0, 256, 256)
 [sub_resource type="AtlasTexture" id="AtlasTexture_5"]
 atlas = ExtResource("1_qu4a1")
 region = Rect2(0, 256, 256, 256)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_c1"]
-atlas = ExtResource("2_charge")
-region = Rect2(0, 0, 256, 256)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_c2"]
-atlas = ExtResource("2_charge")
-region = Rect2(256, 0, 256, 256)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_c3"]
-atlas = ExtResource("2_charge")
-region = Rect2(0, 256, 256, 256)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_c4"]
-atlas = ExtResource("2_charge")
-region = Rect2(256, 256, 256, 256)
 
 [resource]
 animations = [{
@@ -60,21 +43,4 @@ animations = [{
 "loop": true,
 "name": &"idle",
 "speed": 10.0
-}, {
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_c1")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_c2")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_c3")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_c4")
-}],
-"loop": true,
-"name": &"charge",
-"speed": 5.0
 }]

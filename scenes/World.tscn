@@ -1,9 +1,10 @@
 [gd_scene load_steps=5 format=3]
 
-[ext_resource type="Script" path="res://scripts/game_world.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://素材/backgrounds/forest_bg.png" id="2_bg_tex"]
-[ext_resource type="PackedScene" path="res://scenes/Player.tscn" id="3_player"]
-[ext_resource type="PackedScene" path="res://scenes/Enemy.tscn" id="4_enemy"]
+[ext_resource type="Script" uid="uid://csqh8ko7h2fmk" path="res://scripts/game_world.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dendg2p3kb41q" path="res://素材/backgrounds/forest_bg.png" id="2_bg_tex"]
+[ext_resource type="PackedScene" uid="uid://k1ph625dlegf" path="res://scenes/Arthur.tscn" id="3_player"]
+[ext_resource type="PackedScene" uid="uid://cdhtowufwsapu" path="res://scenes/Enemy.tscn" id="4_enemy"]
+
 
 [node name="World" type="Node2D"]
 script = ExtResource("1_script")

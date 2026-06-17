@@ -1,9 +1,10 @@
-[gd_scene load_steps=29 format=3 uid="uid://cdhtowufwsapu"]
+[gd_scene load_steps=35 format=3 uid="uid://cdhtowufwsapu"]
 
 [ext_resource type="Script" uid="uid://cg746afresadj" path="res://scripts/enemy.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://c66h6pwho8ux4" path="res://素材/monster/5.png" id="3_mpr68"]
-[ext_resource type="Texture2D" uid="uid://c6eahexktn0fv" path="res://素材/monster/yuren.png" id="4_5wwv6"]
-[ext_resource type="Texture2D" uid="uid://cgnt4ds7o13uf" path="res://素材/monster/6.png" id="4_ft8do"]
+[ext_resource type="Texture2D" uid="uid://2ja5sj13vot3" path="res://素材/monster/5.png" id="3_mpr68"]
+[ext_resource type="Texture2D" uid="uid://dgmhu42ys8j1i" path="res://素材/monster/yuren1.png" id="4_5wwv6"]
+[ext_resource type="Texture2D" uid="uid://dc5y1ibshb500" path="res://素材/monster/6.png" id="4_ft8do"]
+[ext_resource type="Texture2D" uid="uid://e07fxxk3huul" path="res://素材/monster/yuren_destroy.png" id="5_5wwv6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_enemy"]
 size = Vector2(77, 71)
@@ -141,6 +142,26 @@ region = Rect2(768, 256, 256, 256)
 atlas = ExtResource("4_5wwv6")
 region = Rect2(0, 512, 256, 256)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_u1yns"]
+atlas = ExtResource("5_5wwv6")
+region = Rect2(0, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8fyuy"]
+atlas = ExtResource("5_5wwv6")
+region = Rect2(256, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_q5i3e"]
+atlas = ExtResource("5_5wwv6")
+region = Rect2(512, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_16wof"]
+atlas = ExtResource("5_5wwv6")
+region = Rect2(768, 0, 256, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hkgyc"]
+atlas = ExtResource("5_5wwv6")
+region = Rect2(0, 256, 256, 256)
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_u1yns"]
 animations = [{
 "frames": [{
@@ -173,7 +194,27 @@ animations = [{
 }],
 "loop": true,
 "name": &"default",
-"speed": 5.0
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_u1yns")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8fyuy")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_q5i3e")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_16wof")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hkgyc")
+}],
+"loop": true,
+"name": &"destroy",
+"speed": 8.0
 }]
 
 [node name="Enemy" type="Area2D" groups=["enemies"]]
@@ -194,18 +235,17 @@ polygon = PackedVector2Array(-30, -15, -21.21, -21.21, 0, -30, 21.21, -21.21, 30
 
 [node name="niaoren" type="AnimatedSprite2D" parent="."]
 visible = false
-position = Vector2(-1.7697645, -4.855278)
+position = Vector2(-9.769765, -5.855278)
 rotation = -0.08552113
 scale = Vector2(0.5687704, 0.5597023)
 sprite_frames = SubResource("SpriteFrames_oq86d")
-animation = &"destroy"
-frame_progress = 0.3094514
+frame_progress = 0.5787221
 speed_scale = 1.15
 
 [node name="yuren" type="AnimatedSprite2D" parent="."]
 position = Vector2(-0.7416085, -1.7899656)
 scale = Vector2(0.53704387, 0.5328909)
 sprite_frames = SubResource("SpriteFrames_u1yns")
-frame_progress = 0.14883897
+frame_progress = 0.5970725
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

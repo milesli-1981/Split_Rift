@@ -90,7 +90,7 @@ horizontal_alignment = 1
 [node name="ControlHint" type="Label" parent="Panel/VBoxContainer"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 14
-text = "上下键选择，Z键确认"
+text = "WASD/方向键选择，Z/空格/回车确认"
 horizontal_alignment = 1
 
 [node name="DebugModeLabel" type="Label" parent="Panel/VBoxContainer"]

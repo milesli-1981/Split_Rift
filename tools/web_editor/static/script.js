@@ -22,7 +22,8 @@ const applyChangesBtn = document.getElementById('applyChangesBtn');
 
 // Composer Toolbar
 const gridToggle = document.getElementById('gridToggle');
-const gridColsSelect = document.getElementById('gridColsSelect');
+const gridColsInput = document.getElementById('gridColsInput');
+const gridRowsInput = document.getElementById('gridRowsInput');
 const autoAlignBtn = document.getElementById('autoAlignBtn');
 const deleteFrameBtn = document.getElementById('deleteFrameBtn');
 const downloadSheetBtn = document.getElementById('downloadSheetBtn');
@@ -30,6 +31,9 @@ const fpsSlider = document.getElementById('fpsSlider');
 const fpsVal = document.getElementById('fpsVal');
 const frameScaleSlider = document.getElementById('frameScaleSlider');
 const frameScaleVal = document.getElementById('frameScaleVal');
+const globalScaleSlider = document.getElementById('globalScaleSlider');
+const globalScaleVal = document.getElementById('globalScaleVal');
+const applyGlobalScaleBtn = document.getElementById('applyGlobalScaleBtn');
 const framePropsPanel = document.getElementById('framePropsPanel');
 const noFrameSelectedHint = document.getElementById('noFrameSelectedHint');
 const composerFrameList = document.getElementById('composerFrameList');
@@ -371,7 +375,13 @@ function updateComposerFrameListUI() {
 }
 
 clearCollectionBtn.onclick = () => { frames = []; selectedFrameIndex = -1; updateCollectionUI(); if(document.querySelector('.tab-btn[data-tab="composer"]').classList.contains('active')) renderComposer(); };
-downloadEditorBtn.onclick = () => { const a = document.createElement('a'); a.download = 'editor_export.png'; a.href = editorCanvas.toDataURL(); a.click(); };
+downloadEditorBtn.onclick = () => { 
+    const a = document.createElement('a'); 
+    a.download = 'sprite_export.png'; 
+    // Use displayCanvas instead of editorCanvas to avoid capturing the selection UI
+    a.href = displayCanvas.toDataURL(); 
+    a.click(); 
+};
 
 applyChangesBtn.onclick = () => {
     // Solidify the current view (Clean + Eraser) as the new baseImage
@@ -485,11 +495,23 @@ extractVideoFramesBtn.onclick = async () => {
 function renderComposer(forExport = false) {
     compCtx.clearRect(0, 0, 1024, 1024);
     if (gridToggle.checked && !forExport) {
+        const cols = parseInt(gridColsInput.value) || 1;
+        const rows = parseInt(gridRowsInput.value) || 1;
+        const cellW = 1024 / cols;
+        const cellH = 1024 / rows;
+
         compCtx.strokeStyle = '#333';
         compCtx.lineWidth = 1;
-        for (let i = 0; i <= 1024; i += 64) {
-            compCtx.beginPath(); compCtx.moveTo(i, 0); compCtx.lineTo(i, 1024); compCtx.stroke();
-            compCtx.beginPath(); compCtx.moveTo(0, i); compCtx.lineTo(1024, i); compCtx.stroke();
+        
+        // Draw columns
+        for (let i = 0; i <= cols; i++) {
+            const x = i * cellW;
+            compCtx.beginPath(); compCtx.moveTo(x, 0); compCtx.lineTo(x, 1024); compCtx.stroke();
+        }
+        // Draw rows
+        for (let i = 0; i <= rows; i++) {
+            const y = i * cellH;
+            compCtx.beginPath(); compCtx.moveTo(0, y); compCtx.lineTo(1024, y); compCtx.stroke();
         }
     }
 
@@ -580,15 +602,23 @@ window.addEventListener('mousemove', (e) => {
 window.addEventListener('mouseup', () => isDraggingFrame = false);
 
 autoAlignBtn.onclick = () => {
-    const cols = parseInt(gridColsSelect.value);
-    const step = 1024 / cols;
+    const cols = parseInt(gridColsInput.value) || 1;
+    const rows = parseInt(gridRowsInput.value) || 1;
+    
+    const cellW = 1024 / cols;
+    const cellH = 1024 / rows;
+    
     frames.forEach((f, i) => {
         const col = i % cols;
         const row = Math.floor(i / cols);
-        const centerX = col * step + step / 2;
-        const centerY = row * step + step / 2;
-        f.x = centerX - f.anchorX * f.scale;
-        f.y = centerY - f.anchorY * f.scale;
+        
+        // Don't place beyond configured rows
+        if (row < rows) {
+            const centerX = col * cellW + cellW / 2;
+            const centerY = row * cellH + cellH / 2;
+            f.x = centerX - f.anchorX * f.scale;
+            f.y = centerY - f.anchorY * f.scale;
+        }
     });
     renderComposer();
 };
@@ -602,6 +632,24 @@ frameScaleSlider.oninput = () => {
     } 
 };
 gridToggle.onchange = renderComposer;
+gridColsInput.oninput = renderComposer;
+gridRowsInput.oninput = renderComposer;
+
+applyGlobalScaleBtn.onclick = () => {
+    const scale = parseFloat(globalScaleSlider.value);
+    frames.forEach(f => {
+        f.scale = scale;
+    });
+    if (selectedFrameIndex !== -1) {
+        frameScaleSlider.value = scale;
+        frameScaleVal.textContent = scale.toFixed(2);
+    }
+    renderComposer();
+};
+
+globalScaleSlider.oninput = () => {
+    globalScaleVal.textContent = parseFloat(globalScaleSlider.value).toFixed(2);
+};
 
 // Preview Animation
 function animate(time) {
