@@ -4,7 +4,7 @@ extends Node
 const CHARACTERS = {
 	"Arthur": {
 		"display_name": "剑修·Arthur",
-		"portrait_path": "res://素材/ui/avatar_jianxiu.png",
+		"portrait_path": "res://assets/ui/avatar_jianxiu.png",
 		"speed": 550.0,
 		"fire_rate": 0.25,
 		"charge_speed": 1.3,
@@ -14,12 +14,12 @@ const CHARACTERS = {
 		"color": Color(0.8, 0.9, 1.0),
 		"bullet_index": 18,
 		"character_scene_path": "res://scenes/Arthur.tscn",
-		"sprite_frames_path": "res://素材/characters/jianxiu/Arthur_SpriteFrames.tres",
+		"sprite_frames_path": "res://assets/characters/jianxiu/Arthur_SpriteFrames.tres",
 		"sprite_scale": Vector2(1.0, 1.0), # 基础缩放
 		"anim_speed": 0.15,
 		"frame_offsets": [],
 		"charge_visuals": {
-			"sprite_path": "res://素材/characters/jianxiu/charge_effect.png",
+			"sprite_path": "res://assets/characters/jianxiu/charge_effect.png",
 			"hframes": 4,
 			"vframes": 4,
 			"scale_multiplier": 1.0,
@@ -37,7 +37,7 @@ const CHARACTERS = {
 	},
 	"nvgui": {
 		"display_name": "女鬼",
-		"portrait_path": "res://素材/ui/avatar_jianxiu.png",
+		"portrait_path": "res://assets/ui/avatar_jianxiu.png",
 		"speed": 500.0,
 		"fire_rate": 0.2,
 		"charge_speed": 1.2,
@@ -47,13 +47,13 @@ const CHARACTERS = {
 		"color": Color(0.9, 0.9, 0.9),
 		"bullet_index": 4,
 		"character_scene_path": "res://scenes/Nvgui.tscn",
-		"sprite_frames_path": "res://素材/characters/nvgui/nvgui_SpriteFrames.tres",
+		"sprite_frames_path": "res://assets/characters/nvgui/nvgui_SpriteFrames.tres",
 		"sprite_scale": Vector2(1.0, 1.0),
 		"anim_speed": 0.15,
-		"idle_sprite_path": "res://素材/characters/nvgui/idle.png",
+		"idle_sprite_path": "res://assets/characters/nvgui/idle.png",
 		"charge_visuals": {
 			"vfx_enabled": true,
-			"sprite_path": "res://素材/characters/nvgui/charge.png",
+			"sprite_path": "res://assets/characters/nvgui/charge.png",
 			"hframes": 4,
 			"vframes": 4,
 			"scale_multiplier": 1.5,
@@ -72,10 +72,10 @@ const CHARACTERS = {
 		"extra_type": "PIG",
 		"color": Color(1.0, 1.0, 0.5),
 		"bullet_index": 4, # 黄色点状
-		"sprite_frames_path": "res://素材/characters/jianxiu/Arthur_SpriteFrames.tres",
+		"sprite_frames_path": "res://assets/characters/jianxiu/Arthur_SpriteFrames.tres",
 		"anim_speed": 0.15,
 		"charge_visuals": {
-			"sprite_path": "res://素材/characters/jianxiu/charge_effect.png",
+			"sprite_path": "res://assets/characters/jianxiu/charge_effect.png",
 			"hframes": 2,
 			"vframes": 2,
 			"scale_multiplier": 1.0
@@ -91,7 +91,7 @@ const CHARACTERS = {
 		"extra_type": "RABBIT",
 		"color": Color(1.0, 0.5, 0.8),
 		"bullet_index": 2, # 粉色点状
-		"sprite_frames_path": "res://素材/characters/jianxiu/Arthur_SpriteFrames.tres",
+		"sprite_frames_path": "res://assets/characters/jianxiu/Arthur_SpriteFrames.tres",
 		"anim_speed": 0.15
 	},
 	"Nanja": {
@@ -104,7 +104,7 @@ const CHARACTERS = {
 		"extra_type": "SWARM",
 		"color": Color(0.5, 1.0, 0.5),
 		"bullet_index": 0, # 绿色点状
-		"sprite_frames_path": "res://素材/characters/jianxiu/Arthur_SpriteFrames.tres",
+		"sprite_frames_path": "res://assets/characters/jianxiu/Arthur_SpriteFrames.tres",
 		"anim_speed": 0.15
 	},
 	"Ran": {
@@ -117,7 +117,7 @@ const CHARACTERS = {
 		"extra_type": "MINE",
 		"color": Color(0.5, 0.5, 1.0),
 		"bullet_index": 20, # 蓝色点状
-		"sprite_frames_path": "res://素材/characters/jianxiu/Arthur_SpriteFrames.tres",
+		"sprite_frames_path": "res://assets/characters/jianxiu/Arthur_SpriteFrames.tres",
 		"anim_speed": 0.15
 	}
 }

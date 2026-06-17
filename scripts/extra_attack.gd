@@ -131,7 +131,7 @@ func _setup_visuals():
 			if sprite:
 				sprite.visible = true
 				if not sprite.texture:
-					sprite.texture = load("res://素材/effects/extra_attack.png")
+					sprite.texture = load("res://assets/effects/extra_attack.png")
 				
 				# 比例进一步缩小 (从 0.18 缩小到 0.12)
 				sprite.scale = Vector2(0.12, 0.12) 

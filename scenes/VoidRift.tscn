@@ -1,8 +1,8 @@
 [gd_scene load_steps=32 format=3]
 
 [ext_resource type="Script" path="res://scripts/void_rift.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://素材/effects/void_rift_1.png" id="2_b7ndr"]
-[ext_resource type="Texture2D" path="res://素材/effects/void_rift_2.png" id="3_soelw"]
+[ext_resource type="Texture2D" path="res://assets/effects/void_rift_1.png" id="2_b7ndr"]
+[ext_resource type="Texture2D" path="res://assets/effects/void_rift_2.png" id="3_soelw"]
 
 [sub_resource type="Shader" id="Shader_remove_bg_black"]
 code = "shader_type canvas_item;\n\nuniform vec4 bg_color : source_color = vec4(0.0, 0.0, 0.0, 1.0);\nuniform float threshold : hint_range(0.0, 1.0) = 0.1;\n\nvoid fragment() {\n    vec4 col = texture(TEXTURE, UV);\n    float diff = distance(col.rgb, bg_color.rgb);\n    if (diff < threshold && col.a > 0.0) {\n        col.a = 0.0;\n    }\n    COLOR = col * COLOR;\n}"

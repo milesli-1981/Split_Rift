@@ -1,7 +1,7 @@
 [gd_scene load_steps=10 format=3 uid="uid://b15hp463hf53q"]
 
 [ext_resource type="Script" uid="uid://b14x7s71x7bxe" path="res://scripts/charge_attack.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://cbtvncfn65i0v" path="res://素材/effects/charge_attack.png" id="2_07jra"]
+[ext_resource type="Texture2D" uid="uid://cbtvncfn65i0v" path="res://assets/effects/charge_attack.png" id="2_07jra"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_charge"]
 size = Vector2(61.25, 164)

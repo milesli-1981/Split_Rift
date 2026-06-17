@@ -1,10 +1,10 @@
 [gd_scene load_steps=35 format=3 uid="uid://cdhtowufwsapu"]
 
 [ext_resource type="Script" uid="uid://cg746afresadj" path="res://scripts/enemy.gd" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://2ja5sj13vot3" path="res://素材/monster/5.png" id="3_mpr68"]
-[ext_resource type="Texture2D" uid="uid://dgmhu42ys8j1i" path="res://素材/monster/yuren1.png" id="4_5wwv6"]
-[ext_resource type="Texture2D" uid="uid://dc5y1ibshb500" path="res://素材/monster/6.png" id="4_ft8do"]
-[ext_resource type="Texture2D" uid="uid://e07fxxk3huul" path="res://素材/monster/yuren_destroy.png" id="5_5wwv6"]
+[ext_resource type="Texture2D" uid="uid://2ja5sj13vot3" path="res://assets/monster/5.png" id="3_mpr68"]
+[ext_resource type="Texture2D" uid="uid://dgmhu42ys8j1i" path="res://assets/monster/yuren1.png" id="4_5wwv6"]
+[ext_resource type="Texture2D" uid="uid://dc5y1ibshb500" path="res://assets/monster/6.png" id="4_ft8do"]
+[ext_resource type="Texture2D" uid="uid://e07fxxk3huul" path="res://assets/monster/yuren_destroy.png" id="5_5wwv6"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_enemy"]
 size = Vector2(77, 71)

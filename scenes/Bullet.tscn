@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/bullet.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://素材/characters/jianxiu/bullet.png" id="2_p1sfj"]
+[ext_resource type="Texture2D" path="res://assets/characters/jianxiu/bullet.png" id="2_p1sfj"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_bullet"]
 size = Vector2(42.75, 112.75)

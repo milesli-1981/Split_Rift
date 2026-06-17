@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/hud.gd" id="1_script"]
-[ext_resource type="Texture2D" path="res://素材/ui/info_panel_review.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://assets/ui/info_panel_review.png" id="2_bg"]
 
 [node name="HUD" type="Control"]
 custom_minimum_size = Vector2(400, 120)

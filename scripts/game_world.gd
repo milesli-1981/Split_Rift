@@ -9,7 +9,7 @@ var game_time: float = 0.0
 var bg_scroll_speed: float = 50.0 # Speed of background scrolling
 
 var cloud_spawn_timer: float = 0.0
-var cloud_texture: Texture2D = preload("res://素材/backgrounds/cloud_clean.png")
+var cloud_texture: Texture2D = preload("res://assets/backgrounds/cloud_clean.png")
 
 var fever_spawned: bool = false
 var death_spawned: bool = false

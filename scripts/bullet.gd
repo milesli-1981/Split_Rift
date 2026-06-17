@@ -11,7 +11,7 @@ func _ready():
 		var sprite = $Sprite2D
 		# 如果编辑器中没有设置纹理，才加载默认子弹图集
 		if sprite.texture == null:
-			sprite.texture = load("res://素材/characters/jianxiu/bullet.png")
+			sprite.texture = load("res://assets/characters/jianxiu/bullet.png")
 			sprite.hframes = 8
 			sprite.vframes = 4
 			sprite.frame = bullet_index
